@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "471245254584",
+    "project_id": "fintak-3ba47",
+    "storage_bucket": "fintak-3ba47.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:471245254584:android:bac7cac0c78df6801aa94d",
+        "android_client_info": {
+          "package_name": "com.example.fintak"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAHu5Mucfsehjn34aWmUAY6O71u6io7fE4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
