@@ -1,12 +1,14 @@
 
 import 'package:fintak/data/datasources/local_datasource.dart';
 import 'package:fintak/data/models/app_state.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
 class AppStateNotifier extends StateNotifier<AppState>{
   final LocalDatasource _dataSource;
   AppStateNotifier(this._dataSource):super(const AppState()){
     _loadTheme();
+    _checkAuthState();
   }
  Future<void>_loadTheme()async{
   final isDarkMode= await _dataSource.getTheme();
@@ -29,6 +31,12 @@ class AppStateNotifier extends StateNotifier<AppState>{
  void clearUser(){
   state=state.copyWith(currentUserId: null);
  }
+ void _checkAuthState() {
+  final user = FirebaseAuth.instance.currentUser;
+  if (user != null) {
+    state = state.copyWith(currentUserId: user.uid);
+  }
+}
 }
 
 final appStateProvider=StateNotifierProvider<AppStateNotifier,AppState>((ref){

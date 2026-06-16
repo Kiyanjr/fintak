@@ -213,7 +213,7 @@ class AuthViewmodel extends StateNotifier<AuthState> {
 }
 
 //    riverpod
- final authViewmodelProvider=StateNotifierProvider<AuthViewmodel,AuthState>((ref){
+ final authViewModelProvider=StateNotifierProvider<AuthViewmodel,AuthState>((ref){
 final datasource=ref.watch(localDataSourceProvider).requireValue;
 return AuthViewmodel(datasource);
  });

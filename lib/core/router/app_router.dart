@@ -1,7 +1,7 @@
 import 'package:fintak/core/providers/app_providers.dart';
 import 'package:fintak/features/budget/screens/budget_screen.dart';
 import 'package:fintak/features/home/screens/home_screen.dart';
-import 'package:fintak/features/auth/screens/login_scren.dart';
+import 'package:fintak/features/auth/screens/login_screen.dart';
 import 'package:fintak/features/settings/screens/settings_screen.dart';
 import 'package:fintak/features/auth/screens/sign_up_screen.dart';
 import 'package:fintak/features/stats/screens/state_screen.dart';
@@ -11,75 +11,79 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 class RouterNotifire extends ChangeNotifier {
-final Ref _ref;
-RouterNotifire(this._ref){
-  _ref.listen(appStateProvider, (_,__){notifyListeners();});
-}
+  final Ref _ref;
+  RouterNotifire(this._ref) {
+    _ref.listen(appStateProvider, (_, __) {
+      notifyListeners();
+    });
+  }
 }
 
-final appRouterProvider=Provider<GoRouter>((ref){
- return GoRouter(
-   // Starting point
+final appRouterProvider = Provider<GoRouter>((ref) {
+  return GoRouter(
+    // Starting point
     initialLocation: '/login',
     
     // connecting that to our Class
     refreshListenable: RouterNotifire(ref),
-  redirect: (context,state){
-   // Get the current app state using ref.read (or ref.watch inside provider)
-    final appState=ref.watch(appStateProvider);
-    final currentUserId=appState.currentUserId;
-    //   Get the screen that user is tryin to open
-    final  matchedLocation=state.matchedLocation;
+    
+    redirect: (context, state) {
+      // Get the current app state using ref.watch
+      final appState = ref.watch(appStateProvider);
+      final currentUserId = appState.currentUserId;
+      
+      // Get the screen that user is trying to open
+      final matchedLocation = state.matchedLocation;
 
-      //  LOG SING SENARIOS
-
-                // NOT LOGGED
-      if(currentUserId==null&& matchedLocation!='/login'&&matchedLocation!='/signup'){
+      // NOT LOGGED IN SENARIO: If trying to access protected routes, force to login
+      if (currentUserId == null && matchedLocation != '/login' && matchedLocation != '/signup') {
         return '/login';
       }
-      if(currentUserId!=null&&(matchedLocation=='/login'&&matchedLocation=='/singup')){
-         return'/home';
+      
+      // LOGGED IN SENARIO: If already logged in and trying to open login or signup, send to home
+      // FIXED: Changed 'singup' to 'signup' and '&&' to '||'
+      if (currentUserId != null && (matchedLocation == '/login' || matchedLocation == '/signup')) {
+        return '/home';
       }
+      
       return null;
-  },
-  //      APP ROUTES
-  routes: [
-    GoRoute(
-      path: '/login',
-      builder: (context, state) => const LoginScreen(),
+    },
+    
+    // APP ROUTES
+    routes: [
+      GoRoute(
+        path: '/login',
+        builder: (context, state) => const LoginScreen(),
       ),
-       GoRoute(
-      path: '/singup',
-      builder: (context, state) => const SignUpScreen(),
+      GoRoute(
+        path: '/signup', // 👈 FIXED: Changed from /singup to /signup
+        builder: (context, state) => const SignUpScreen(),
       ),
+      
       // ShellRoute wraps the main tabs inside the BottomNavShell
       ShellRoute(
-         builder: (context, state, child) {
-           return BottomNavShell(child: child);
-         },
-         routes: [
+        builder: (context, state, child) {
+          return BottomNavShell(child: child);
+        },
+        routes: [
           GoRoute(
-           path: '/home',
-           builder: (context, state) => const HomeScreen(),
+            path: '/home',
+            builder: (context, state) => const HomeScreen(),
           ),
-           GoRoute(
+          GoRoute(
             path: '/budget',
             builder: (context, state) => const BudgetScreen(),
           ),
-           GoRoute(
+          GoRoute(
             path: '/stats',
             builder: (context, state) => const StateScreen(),
           ),
-           GoRoute(
+          GoRoute(
             path: '/settings',
             builder: (context, state) => const SettingsScreen(),
           ),
-    
-         ]
+        ],
       ),
-  ],
- );
-  
+    ],
+  );
 });
-
-
