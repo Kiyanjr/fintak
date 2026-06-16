@@ -6,33 +6,37 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-class SignUpScreen extends ConsumerWidget {
-  const SignUpScreen({super.key});
+class LoginScreen extends ConsumerWidget {
+  const LoginScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(authViewModelProvider);
     final viewModel = ref.read(authViewModelProvider.notifier);
+    
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
           physics: const ClampingScrollPhysics(),
           child: Padding(
-            padding: EdgeInsetsGeometry.symmetric(horizontal: 24, vertical: 20),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 24,
+              vertical: 20,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 16),
-
-                // LOGO ROW
+                
+                //  LOGO ROW 
                 Row(
                   children: [
                     Container(
-                      height: 34,
                       width: 34,
+                      height: 34,
                       decoration: BoxDecoration(
                         color: AppColors.accent,
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(11),
                       ),
                       child: const Icon(
                         Icons.show_chart_rounded,
@@ -41,23 +45,22 @@ class SignUpScreen extends ConsumerWidget {
                       ),
                     ),
                     const SizedBox(width: 8),
-
                     const Text(
                       'Fintak',
                       style: TextStyle(
-                        color: AppColors.accent,
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
+                        color: AppColors.accent,
                       ),
                     ),
                   ],
                 ),
-
-                //     CREATE ACCOUNT
+                
                 const SizedBox(height: 28),
-
+                
+                //  Welcome texts 
                 Text(
-                  'Create Account',
+                  'Welcome back',
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.w700,
@@ -65,37 +68,26 @@ class SignUpScreen extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(height: 4),
-
                 Text(
-                  'Start Tracking your finances',
+                  'Sign in your account',
                   style: TextStyle(
-                    fontSize: 15,
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.onSurface.withOpacity(0.5),
+                    fontSize: 13,
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
                   ),
                 ),
+
                 const SizedBox(height: 28),
 
                 //  Form Input Fields
                 AuthTextField(
-                  lable: 'Full name',
-                  hint: 'Max Verstappen',
-                  icon: Icons.person_outline_rounded,
-                  onChanged: viewModel.updateName,
-                ),
-                const SizedBox(height: 14),
-
-                //   EMAIL ADDRESS
-                AuthTextField(
                   lable: 'Email address',
-                  hint: 'Max@gmail.com',
-                  icon: Icons.mail_outline_rounded,
+                  hint: 'you@gmail.com',
+                  icon: Icons.mail_outline_outlined,
                   onChanged: viewModel.upadateEmail,
                 ),
+
                 const SizedBox(height: 14),
 
-                // PassWrod
                 AuthTextField(
                   lable: 'Password',
                   hint: '••••••••',
@@ -105,21 +97,26 @@ class SignUpScreen extends ConsumerWidget {
                   onToggleVisibility: viewModel.togglePasswordVisibility,
                   onChanged: viewModel.updatePassWord,
                 ),
-                const SizedBox(height: 14),
-
-                // MONTLY BUDGET
-                AuthTextField(
-                  lable: 'Monthly budegt (💲)',
-                  hint: '2,500',
-                  icon: Icons.attach_money_outlined,
-                  keynoardType: TextInputType.number,
-                  onChanged: (v) => viewModel.updateMonthlyBudget(
-                    double.tryParse(v) ?? 2500.0,
+                
+                const SizedBox(height: 8),
+                
+                //  Forgot Password Button
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: () {},
+                    child: const Text(
+                      'Forgot password ?',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.accent,
+                      ),
+                    ),
                   ),
                 ),
-                const SizedBox(height: 20),
 
-                // ANIMATED SWITCHER
+                //  Animated Error Container
                 AnimatedSwitcher(
                   duration: const Duration(milliseconds: 300),
                   child: state.errorMessage != null
@@ -143,31 +140,72 @@ class SignUpScreen extends ConsumerWidget {
                 ),
 
                 const SizedBox(height: 12),
-                // Create Action Button
+
+                //  Action Button
                 AppButton(
-                  label: 'Create account',
+                  label: 'Sing in',
                   isLoading: state.isLoading,
-                  onPressed: () => viewModel.singUp(ref),
+                  onPressed: () => viewModel.signIn(ref),
                 ),
 
-                const SizedBox(height: 28),
-                // Sign In Alternative Link
+                const SizedBox(height: 24),
+                
+                //  Divider Row
                 Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const Expanded(child: Divider()),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      child: Text(
+                        'or continue with',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                        ),
+                      ),
+                    ),
+                    const Expanded(child: Divider()),
+                  ],
+                ),
+
+                const SizedBox(height: 16),
+                
+                //  Social Buttons Row
+                Row(
+                  children: [
+                    const Expanded(
+                      child: _SocialButton(
+                        label: 'Google',
+                        icon: Icons.g_mobiledata_rounded,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    const Expanded(
+                      child: _SocialButton(
+                        label: 'Apple',
+                        icon: Icons.apple_rounded,
+                      ),
+                    ),
+                  ],
+                ),
+                
+                const SizedBox(height: 28),
+                
+                //  Navigation Link to SignUp
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'Already have an account? ',
+                      'Dont have an account ? ',
                       style: TextStyle(
                         fontSize: 12,
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.onSurface.withOpacity(0.5),
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
                       ),
                     ),
                     GestureDetector(
-                      onTap: () => context.go('/login'),
-                      child: Text(
-                        'Sign in',
+                      onTap: () => context.push('/signup'),
+                      child: const Text(
+                        'Sign up',
                         style: TextStyle(
                           fontSize: 12,
                           color: AppColors.accent,
@@ -180,6 +218,32 @@ class SignUpScreen extends ConsumerWidget {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SocialButton extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  
+  const _SocialButton({required this.label, required this.icon});
+  
+  @override
+  Widget build(BuildContext context) {
+    return OutlinedButton.icon(
+      onPressed: () {},
+      icon: Icon(icon, size: 15,color: Colors.blueGrey),
+      label: Text(
+        label,
+        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500,color: Colors.blueGrey),
+      ),
+      style: OutlinedButton.styleFrom(
+        minimumSize: const Size(double.infinity, 44),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        side: BorderSide(
+          color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
         ),
       ),
     );
