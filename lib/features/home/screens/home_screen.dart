@@ -1,3 +1,4 @@
+import 'package:fintak/features/home/widgets/balance_card.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -6,7 +7,9 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(child:Text('Home screen')),
+      body: Center(
+        child: BalanceCard(totalExpense: 100000, totalIncome: 300000000),
+        ),
     );
   }
 }

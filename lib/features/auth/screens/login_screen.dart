@@ -143,7 +143,7 @@ class LoginScreen extends ConsumerWidget {
 
                 //  Action Button
                 AppButton(
-                  label: 'Sing in',
+                  label: 'Sign in',
                   isLoading: state.isLoading,
                   onPressed: () => viewModel.signIn(ref),
                 ),
