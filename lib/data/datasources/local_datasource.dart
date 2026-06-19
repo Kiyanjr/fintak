@@ -51,12 +51,12 @@ class LocalDatasource {
         .toList();
   }
 
-  Future<bool> getTheme() async {
-    return _pref!.getBool('isDarkMode') ?? false;
-  }
-
   Future<void> saveTheme(bool isDarkMode) async {
     await _pref!.setBool('isDarkMode', isDarkMode);
+  }
+
+  Future<bool> getTheme() async {
+    return _pref!.getBool('isDarkMode') ?? false;
   }
 
   //  Accepts a single UserModel, converts to map, encodes to string, saves

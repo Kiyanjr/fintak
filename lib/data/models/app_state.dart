@@ -1,8 +1,8 @@
-  //  GLOBAL STAE OF THE APP
+  //  GLOBAL STATE OF THE APP
 class AppState {
 final bool isDarkMode;
 final String? currentUserId;
-  // checking the null of user is it ogged or not
+  // checking the null of user is it logged or not
 static const _sentinel=Object();
 
 const AppState({this.isDarkMode=false,this.currentUserId});
