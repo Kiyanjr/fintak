@@ -68,19 +68,19 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         routes: [
           GoRoute(
             path: '/home',
-            builder: (context, state) => const HomeScreen(),
+            builder: (context, state) =>  HomeScreen(),
           ),
           GoRoute(
             path: '/budget',
-            builder: (context, state) => const BudgetScreen(),
+            builder: (context, state) =>  BudgetScreen(),
           ),
           GoRoute(
             path: '/stats',
-            builder: (context, state) => const StateScreen(),
+            builder: (context, state) =>  StateScreen(),
           ),
           GoRoute(
             path: '/settings',
-            builder: (context, state) => const SettingsScreen(),
+            builder: (context, state) =>  SettingsScreen(),
           ),
         ],
       ),

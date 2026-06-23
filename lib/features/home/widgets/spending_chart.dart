@@ -77,7 +77,7 @@ class SpendingChart extends StatelessWidget {
                   bottomTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
-                      reservedSize: 20,
+                      reservedSize: 20, // 20 pixles for months names
                       getTitlesWidget: (value, meta) {
                         // NOTE  month is hardcoded for not later must be dynamic
                         const months = [
