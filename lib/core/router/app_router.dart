@@ -53,11 +53,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     routes: [
       GoRoute(
         path: '/login',
-        builder: (context, state) => const LoginScreen(),
+        builder: (context, state) =>  LoginScreen(),
       ),
       GoRoute(
         path: '/signup', // 👈 FIXED: Changed from /singup to /signup
-        builder: (context, state) => const SignUpScreen(),
+        builder: (context, state) =>  SignUpScreen(),
       ),
       
       // ShellRoute wraps the main tabs inside the BottomNavShell

@@ -53,12 +53,14 @@ class TransactionTile extends StatelessWidget {
     };
   }
 
-  String _fromatDateAndCategory(TransactionModel transaction){
-    final dateString=DateFormat('MMM d').format(transaction.date);
-    final categoryString=transaction.category.name;
-    final categoryLabel=categoryString[0].toUpperCase() + categoryString.substring(1);
+  String _fromatDateAndCategory(TransactionModel transaction) {
+    final dateString = DateFormat('MMM d').format(transaction.date);
+    final categoryString = transaction.category.name;
+    final categoryLabel =
+        categoryString[0].toUpperCase() + categoryString.substring(1);
     return '$dateString · $categoryLabel';
   }
+
   String _formatAmount(TransactionModel transaction) {
     final formatter = NumberFormat.currency(symbol: '\$', decimalDigits: 2);
     final prefix = transaction.type == TransactionType.income ? '+' : '-';
@@ -107,9 +109,12 @@ class TransactionTile extends StatelessWidget {
                 const SizedBox(height: 2),
 
                 Text(
-                    _fromatDateAndCategory(transaction),
-                    style: TextStyle(fontSize: 10, color: onSurfaceColor.withOpacity(0.5)),
-                )
+                  _fromatDateAndCategory(transaction),
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: onSurfaceColor.withOpacity(0.5),
+                  ),
+                ),
               ],
             ),
           ),
