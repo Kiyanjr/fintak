@@ -1,6 +1,6 @@
 import 'package:fintak/core/constants/app_colors.dart';
-import 'package:fintak/data/models/transaction_model.dart';
 import 'package:fintak/features/home/viewmodels/home_viewmodel.dart';
+import 'package:fintak/features/home/widgets/add_transaction_sheet.dart';
 import 'package:fintak/features/home/widgets/balance_card.dart';
 import 'package:fintak/features/home/widgets/spending_chart.dart';
 import 'package:fintak/features/home/widgets/transaction_list.dart';
@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class HomeScreen extends ConsumerWidget {
+  const HomeScreen({super.key});
   String _getGreeting() {
     final hour = DateTime.now().hour;
     if (hour < 12) return 'Good morning';
@@ -29,15 +30,24 @@ class HomeScreen extends ConsumerWidget {
 
     //  completed load
     return Scaffold(
-       floatingActionButton: FloatingActionButton(
-        onPressed: (){
-          // wired in next steps
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          showModalBottomSheet(
+            context: context,
+            isScrollControlled:
+                true, // critical — allows sheet to grow taller when keyboard opens
+            backgroundColor:
+                Colors.transparent, // lets our container's borderRadius show
+            builder: (context) => const AddTransactionSheet(),
+          );
         },
         backgroundColor: AppColors.accent,
         foregroundColor: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(16)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadiusGeometry.circular(16),
+        ),
         child: const Icon(Icons.add_rounded),
-       ) ,
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
@@ -134,8 +144,10 @@ class HomeScreen extends ConsumerWidget {
                     ),
                   ],
                 ),
-                       // only the 5 recents are showing
-                TransactionList(transactions: homeState.transactions.take(5).toList()),
+                // only the 5 recents are showing
+                TransactionList(
+                  transactions: homeState.transactions.take(5).toList(),
+                ),
               ], // last
             ),
           ),

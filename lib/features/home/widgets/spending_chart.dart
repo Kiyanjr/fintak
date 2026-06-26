@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 class SpendingChart extends StatelessWidget {
-  List<double> monthlyTotals;
-  SpendingChart({super.key, required this.monthlyTotals});
+ final List<double> monthlyTotals;
+ const SpendingChart({super.key, required this.monthlyTotals});
 
   @override
   Widget build(BuildContext context) {
