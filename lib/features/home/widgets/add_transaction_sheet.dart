@@ -4,14 +4,12 @@ import 'package:fintak/features/auth/widgets/app_button.dart';
 import 'package:fintak/features/auth/widgets/auth_text_field.dart';
 import 'package:fintak/features/home/viewmodels/add_transaction_viewmodel.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 class AddTransactionSheet extends ConsumerStatefulWidget {
   const AddTransactionSheet({super.key});
-  ConsumerState<AddTransactionSheet> createState() =>
-      _AddTransactionSheetState();
+  ConsumerState<AddTransactionSheet> createState() => _AddTransactionSheetState();
 }
 
 class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
