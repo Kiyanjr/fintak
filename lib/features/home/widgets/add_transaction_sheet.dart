@@ -123,6 +123,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                           color: state.type == TransactionType.income
                               ? AppColors.green
                               : Colors.transparent,
+                            borderRadius: BorderRadius.circular(12),
                           border: Border.all(
                             color: state.type == TransactionType.income
                                 ? AppColors.green
@@ -291,7 +292,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                 onPressed: () => viewModel.saveTransaction(ref, context),
               ),
               SizedBox(height: 8)
-            ], // :)
+            ], 
           ),
         ),
       ),

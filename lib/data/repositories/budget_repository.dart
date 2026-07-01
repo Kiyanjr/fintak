@@ -41,6 +41,19 @@ Future<void> deleteBudget(String id)async{
   await _dataSource.saveBudgets(budgets);
 
 }
+
+Future <void> updateBudget(String id, BudgetModel updated)async{
+  final budgets= await _dataSource.getBudgets();
+  final index=budgets.indexWhere(
+    (budget)=>budget.id==id,
+  );
+  if(index!=-1){
+    budgets[index]=updated;
+    await _dataSource.saveBudgets(budgets);
+  }
+}
+
+
 }
 final budgetRepositoryProvider=Provider<BudgetRepository>((ref){
   final datasource=ref.watch(localDataSourceProvider).requireValue;
