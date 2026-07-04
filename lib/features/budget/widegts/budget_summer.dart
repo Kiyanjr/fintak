@@ -18,44 +18,44 @@ class BudgetSummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 1. Calculate overall budget metrics
-    final percentage = totalBudget == 0 ? 0.0 : (totalSpent / totalBudget).clamp(0.0, 1.0);
-    final formatter = NumberFormat.currency(symbol: '€', decimalDigits: 2);
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final onSurface = Theme.of(context).colorScheme.onSurface;
+    final formatter = NumberFormat.currency(symbol: '\$', decimalDigits: 2);
 
-    // 2. Shared decorative style for all cards to prevent duplication
-    final cardDecoration = BoxDecoration(
-      color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
-      borderRadius: BorderRadius.circular(16),
-      border: Border.all(
-        color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
-      ),
-    );
+    // Overall percentage — guarded against division by zero
+    final percentage = totalBudget == 0
+        ? 0.0
+        : (totalSpent / totalBudget).clamp(0.0, 1.0);
+
+    final isOver = totalSpent > totalBudget;
+    final remaining = totalBudget - totalSpent;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // -----------------------------------------------------------------
-        // Child 1: Two stat cards side by side (Spent & Remaining)
-        // -----------------------------------------------------------------
+
+        // ── Row 1: Two stat cards side by side ──
         Row(
           children: [
-            // Left card — Spent info
+
+            // Left card — Spent
             Expanded(
               child: Container(
                 padding: const EdgeInsets.all(14),
-                decoration: cardDecoration,
+                decoration: BoxDecoration(
+                  color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+                  ),
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Spent',
-                      style: TextStyle(
-                        fontSize: 10,
-                        color: onSurface.withOpacity(0.5),
-                      ),
-                    ),
+                    Text('Spent',
+                        style: TextStyle(
+                            fontSize: 10,
+                            color: onSurface.withOpacity(0.5))),
                     const SizedBox(height: 4),
                     Text(
                       formatter.format(totalSpent),
@@ -67,9 +67,10 @@ class BudgetSummaryCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 3),
                     Text(
-                      totalSpent > totalBudget
-                          ? 'Over budget'
-                          : 'of €${totalBudget.toStringAsFixed(0)}',
+                      // If over budget show warning, otherwise show the limit context
+                      isOver
+                          ? 'Over budget!'
+                          : 'of ${formatter.format(totalBudget)}',
                       style: TextStyle(
                         fontSize: 10,
                         color: AppColors.red.withOpacity(0.7),
@@ -79,36 +80,41 @@ class BudgetSummaryCard extends StatelessWidget {
                 ),
               ),
             ),
-            
+
             const SizedBox(width: 10),
-            
-            // Right card — Remaining info
+
+            // Right card — Remaining
             Expanded(
               child: Container(
                 padding: const EdgeInsets.all(14),
-                decoration: cardDecoration,
+                decoration: BoxDecoration(
+                  color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+                  ),
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Remaining',
-                      style: TextStyle(
-                        fontSize: 10,
-                        color: onSurface.withOpacity(0.5),
-                      ),
-                    ),
+                    Text('Remaining',
+                        style: TextStyle(
+                            fontSize: 10,
+                            color: onSurface.withOpacity(0.5))),
                     const SizedBox(height: 4),
                     Text(
-                      formatter.format((totalBudget - totalSpent).abs()),
+                      // Show absolute value — negative sign is confusing here
+                      formatter.format(remaining.abs()),
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w700,
-                        color: totalSpent > totalBudget ? AppColors.red : AppColors.green,
+                        // Red if over budget, green if still within
+                        color: isOver ? AppColors.red : AppColors.green,
                       ),
                     ),
                     const SizedBox(height: 3),
                     Text(
-                      totalSpent > totalBudget ? 'Exceeded' : 'left this month',
+                      isOver ? 'Exceeded' : 'left this month',
                       style: TextStyle(
                         fontSize: 10,
                         color: onSurface.withOpacity(0.4),
@@ -120,50 +126,51 @@ class BudgetSummaryCard extends StatelessWidget {
             ),
           ],
         ),
-        
+
         const SizedBox(height: 10),
-        
-        // -----------------------------------------------------------------
-        // Child 3: Overall progress bar card
-        // -----------------------------------------------------------------
+
+        // ── Row 2: Overall progress bar card ──
         Container(
           padding: const EdgeInsets.all(14),
-          decoration: cardDecoration,
+          decoration: BoxDecoration(
+            color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+            ),
+          ),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Label + percentage number
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  Text('Overall budget used',
+                      style: TextStyle(
+                          fontSize: 11,
+                          color: onSurface.withOpacity(0.5))),
                   Text(
-                    'Overall budget used',
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: onSurface.withOpacity(0.5),
-                    ),
-                  ),
-                  Text(
+                    // Show percentage as whole number
                     '${(percentage * 100).toStringAsFixed(0)}%',
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
-                      color: totalSpent > totalBudget ? AppColors.red : AppColors.accent,
+                      color: isOver ? AppColors.red : AppColors.accent,
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 8),
-              // Fixed height container wrapped around indicator to prevent layout crashes
-              SizedBox(
-                height: 6,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(99),
-                  child: LinearProgressIndicator(
-                    value: percentage,
-                    backgroundColor: isDark ? AppColors.darkBorder : AppColors.lightBorder,
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      totalSpent > totalBudget ? AppColors.red : AppColors.accent,
-                    ),
+              // The actual progress bar — ClipRRect gives rounded corners
+              ClipRRect(
+                borderRadius: BorderRadius.circular(99),
+                child: LinearProgressIndicator(
+                  value: percentage,
+                  minHeight: 6,
+                  backgroundColor:
+                      isDark ? AppColors.darkBorder : AppColors.lightBorder,
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    isOver ? AppColors.red : AppColors.accent,
                   ),
                 ),
               ),
