@@ -1,5 +1,6 @@
 import 'package:fintak/data/models/transaction_model.dart';
 import 'package:fintak/data/repositories/transaction_repository.dart';
+import 'package:fintak/features/budget/viewmodels/budget_viewmodel.dart';
 import 'package:fintak/features/home/viewmodels/home_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -99,7 +100,7 @@ class AddTransactionViewModel extends StateNotifier<AddTransactionState> {
     }
     final parsing = double.tryParse(state.amount.trim());
     if (parsing == null) {
-      _setError('Please enter a valid amoubt');
+      _setError('Please enter a valid amount');
       return false;
     }
     if (parsing <= 0) {
@@ -126,7 +127,7 @@ class AddTransactionViewModel extends StateNotifier<AddTransactionState> {
       await _repository.addTransaction(newTransactionModel);
       //          Homeview model thats main part notice the changes and recall to read new ones
      await ref.read(homeViewmodelProvider.notifier).loadTransactions();
-      
+      await ref.read(budgetViewModelProvider.notifier).loadBudgets();
       state=state.copyWith(isLoading: false);
 
       // closing the sheet 

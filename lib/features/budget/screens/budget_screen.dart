@@ -13,8 +13,10 @@ class BudgetScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final budgetState = ref.watch(budgetViewModelProvider);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final onSurface = Theme.of(context).colorScheme.onSurface;
 
+    // Show spinner while loading
     if (budgetState.isLoading) {
       return const Scaffold(
         body: Center(
@@ -27,105 +29,101 @@ class BudgetScreen extends ConsumerWidget {
       body: SafeArea(
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
+          padding: const EdgeInsets.only(bottom: 90),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // 1. Header component block
+
+                // ── Header: title + add button ──
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'Budget',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
+                        Text('Budget',
+                            style: TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.w700,
+                                color: onSurface)),
                         const SizedBox(height: 2),
+                        // Current month and year subtitle
                         Text(
                           DateFormat('MMMM yyyy').format(DateTime.now()),
                           style: TextStyle(
-                            fontSize: 12,
-                            color: onSurface.withOpacity(0.5),
-                          ),
+                              fontSize: 11,
+                              color: onSurface.withOpacity(0.5)),
                         ),
                       ],
                     ),
+                    // Add budget button
                     IconButton(
-                      icon: const Icon(Icons.add_circle_rounded),
-                      color: AppColors.accent,
-                      iconSize: 30,
-                      onPressed: () => _showAddBudgetSheet(context, ref),
+                      onPressed: () =>
+                          _showAddBudgetSheet(context, ref),
+                      icon: const Icon(
+                        Icons.add_circle_rounded,
+                        color: AppColors.accent,
+                        size: 28,
+                      ),
                     ),
                   ],
                 ),
-                
-                const SizedBox(height: 18),
-                
-                // 2. Budget global calculations card 
+
+                const SizedBox(height: 16),
+
+                // ── Summary cards (spent, remaining, progress bar) ──
                 BudgetSummaryCard(
                   totalBudget: budgetState.totalBudget,
                   totalSpent: budgetState.totalSpent,
                 ),
-                
-                const SizedBox(height: 24),
-                
-                // 3. Section sub-header details
-                Text(
-                  'By category',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: onSurface,
-                  ),
-                ),
-                
-                const SizedBox(height: 12),
-                
-                // 4. Rendering logic matching data criteria streams
-                if (budgetState.categoryItems.isEmpty)
-                  Center(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 40),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.wallet_outlined,
-                            size: 44,
-                            color: Colors.grey.withOpacity(0.4),
-                          ),
-                          const SizedBox(height: 10),
-                          Text(
-                            'No budgets set yet',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: Colors.grey.withOpacity(0.6),
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'Tap + to add a category budget',
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: Colors.grey.withOpacity(0.4),
-                            ),
-                          ),
-                        ],
+
+                const SizedBox(height: 20),
+
+                // ── Section title ──
+                Text('By category',
+                    style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: onSurface)),
+
+                const SizedBox(height: 10),
+
+                // ── Category list or empty state ──
+                budgetState.categoryItems.isEmpty
+                    ? _buildEmptyState(context)
+                    : Column(
+                        children: budgetState.categoryItems
+                            .map((item) => Padding(
+                                  padding:
+                                      const EdgeInsets.only(bottom: 10),
+                                  child: CategoryBudgetCard(
+                                    item: item,
+                                    // Pass delete callback — shows confirm dialog
+                                    onDelete: () => _confirmDelete(
+                                        context, ref, item.budgetId),
+                                  ),
+                                ))
+                            .toList(),
                       ),
-                    ),
-                  )
-                else
-                  ...budgetState.categoryItems.map(
-                    (item) => CategoryBudgetCard(
-                      item: item,
-                      // Pass context and active WidgetRef directly to prompt confirmation safely
-                      onDelete: () => _confirmDelete(context, ref, item.budgetId),
+
+                // Error message if something went wrong
+                if (budgetState.errorMessage != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10),
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: AppColors.redSoft,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        budgetState.errorMessage!,
+                        style: const TextStyle(
+                            color: AppColors.red, fontSize: 12),
+                      ),
                     ),
                   ),
               ],
@@ -136,35 +134,75 @@ class BudgetScreen extends ConsumerWidget {
     );
   }
 
+  // ── Empty state widget ──────────────────────
+  Widget _buildEmptyState(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 40),
+        child: Column(
+          children: [
+            Icon(Icons.wallet_outlined,
+                size: 48,
+                color: Colors.grey.withOpacity(0.35)),
+            const SizedBox(height: 10),
+            Text('No budgets set yet',
+                style: TextStyle(
+                    fontSize: 13,
+                    color: Colors.grey.withOpacity(0.6))),
+            const SizedBox(height: 4),
+            Text('Tap + to add a category budget',
+                style: TextStyle(
+                    fontSize: 11,
+                    color: Colors.grey.withOpacity(0.4))),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ── Add budget bottom sheet ─────────────────
+  // Opens a simple sheet where the user picks a category and enters a limit
   void _showAddBudgetSheet(BuildContext context, WidgetRef ref) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => _AddBudgetSheet(
+        // Pass the callback — called when user saves
+        onSave: (category, limit) {
+          ref
+              .read(budgetViewModelProvider.notifier)
+              .addOrUpdateBudget(category, limit);
+        },
       ),
-      builder: (context) => const _AddBudgetForm(),
     );
   }
 
-  void _confirmDelete(BuildContext context, WidgetRef ref, String budgetId) {
+  // ── Delete confirmation dialog ──────────────
+  void _confirmDelete(
+      BuildContext context, WidgetRef ref, String budgetId) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Delete budget?'),
-        content: const Text('This will remove the budget limit for this category.'),
+        content: const Text(
+            'This will remove the budget limit for this category.'),
         actions: [
+          // Cancel — just close the dialog
           TextButton(
             onPressed: () => Navigator.pop(ctx),
             child: const Text('Cancel'),
           ),
+          // Delete — call viewmodel then close dialog
           TextButton(
             onPressed: () {
               Navigator.pop(ctx);
-              // Directly triggers viewmodel provider state cleanups
-              ref.read(budgetViewModelProvider.notifier).deleteBudget(budgetId);
+              ref
+                  .read(budgetViewModelProvider.notifier)
+                  .deleteBudget(budgetId);
             },
-            child: const Text('Delete', style: TextStyle(color: AppColors.red)),
+            child: const Text('Delete',
+                style: TextStyle(color: AppColors.red)),
           ),
         ],
       ),
@@ -172,82 +210,210 @@ class BudgetScreen extends ConsumerWidget {
   }
 }
 
-class _AddBudgetForm extends StatefulWidget {
-  const _AddBudgetForm();
+// ─────────────────────────────────────────────
+// _AddBudgetSheet
+// Local StatefulWidget — only used inside this file
+// No separate ViewModel needed — logic is simple enough to live here
+// ─────────────────────────────────────────────
+class _AddBudgetSheet extends StatefulWidget {
+  final void Function(TransactionCategory category, double limit) onSave;
+
+  const _AddBudgetSheet({required this.onSave});
 
   @override
-  State<_AddBudgetForm> createState() => _AddBudgetFormState();
+  State<_AddBudgetSheet> createState() => _AddBudgetSheetState();
 }
 
-class _AddBudgetFormState extends State<_AddBudgetForm> {
+class _AddBudgetSheetState extends State<_AddBudgetSheet> {
+  // Default selections
   TransactionCategory _selectedCategory = TransactionCategory.food;
-  final _amountController = TextEditingController();
+  final _limitController = TextEditingController();
+  String? _error;
 
   @override
   void dispose() {
-    _amountController.dispose();
+    _limitController.dispose();
     super.dispose();
+  }
+
+  // Validate and call the onSave callback
+  void _save() {
+    final parsed = double.tryParse(_limitController.text.trim());
+
+    if (parsed == null || parsed <= 0) {
+      setState(() => _error = 'Please enter a valid amount');
+      return;
+    }
+
+    widget.onSave(_selectedCategory, parsed);
+    Navigator.of(context).pop();
   }
 
   @override
   Widget build(BuildContext context) {
-    final paddingBottom = MediaQuery.of(context).viewInsets.bottom;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final onSurface = Theme.of(context).colorScheme.onSurface;
 
-    return Consumer(
-      builder: (context, ref, child) {
-        return Padding(
-          padding: EdgeInsets.fromLTRB(20, 20, 20, 20 + paddingBottom),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.darkSurface : Colors.white,
+        borderRadius:
+            const BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      // Push sheet up when keyboard opens
+      padding: EdgeInsets.only(
+        left: 20,
+        right: 20,
+        top: 20,
+        bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+
+          // ── Sheet header ──
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Set Category Budget',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 16),
-              DropdownButtonFormField<TransactionCategory>(
-                value: _selectedCategory,
-                decoration: const InputDecoration(labelText: 'Category'),
-                items: TransactionCategory.values.map((category) {
-                  return DropdownMenuItem(
-                    value: category,
-                    child: Text(category.name[0].toUpperCase() + category.name.substring(1)),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  if (value != null) {
-                    setState(() => _selectedCategory = value);
-                  }
-                },
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: _amountController,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                decoration: const InputDecoration(
-                  labelText: 'Budget Limit (€)',
-                  prefixText: '€ ',
-                ),
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  final limit = double.tryParse(_amountController.text) ?? 0.0;
-                  if (limit > 0) {
-                    ref.read(budgetViewModelProvider.notifier).addOrupdateBudegt(
-                          _selectedCategory,
-                          limit,
-                        );
-                    Navigator.pop(context);
-                  }
-                },
-                child: const Text('Save'),
+              Text('Set Category Budget',
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: onSurface)),
+              IconButton(
+                onPressed: () => Navigator.of(context).pop(),
+                icon: Icon(Icons.close_rounded,
+                    color: onSurface.withOpacity(0.5)),
               ),
             ],
           ),
-        );
-      },
+
+          const SizedBox(height: 20),
+
+          // ── Category dropdown label ──
+          Text('Category',
+              style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w500,
+                  color: onSurface.withOpacity(0.6))),
+
+          const SizedBox(height: 6),
+
+          // ── Category dropdown ──
+          Container(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+            decoration: BoxDecoration(
+              color:
+                  isDark ? AppColors.darkField : AppColors.lightField,
+              borderRadius: BorderRadius.circular(13),
+            ),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<TransactionCategory>(
+                value: _selectedCategory,
+                isExpanded: true,
+                dropdownColor: isDark
+                    ? AppColors.darkSurface
+                    : AppColors.lightSurface,
+                items: TransactionCategory.values.map((cat) {
+                  // Capitalize for display
+                  final label =
+                      cat.name[0].toUpperCase() + cat.name.substring(1);
+                  return DropdownMenuItem(
+                    value: cat,
+                    child: Text(label,
+                        style:
+                            TextStyle(fontSize: 13, color: onSurface)),
+                  );
+                }).toList(),
+                onChanged: (val) {
+                  if (val != null) {
+                    setState(() => _selectedCategory = val);
+                  }
+                },
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 14),
+
+          // ── Budget limit label ──
+          Text('Monthly limit (€)',
+              style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w500,
+                  color: onSurface.withOpacity(0.6))),
+
+          const SizedBox(height: 6),
+
+          // ── Budget limit text field ──
+          Container(
+            decoration: BoxDecoration(
+              color:
+                  isDark ? AppColors.darkField : AppColors.lightField,
+              borderRadius: BorderRadius.circular(13),
+            ),
+            child: TextField(
+              controller: _limitController,
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
+              style: TextStyle(fontSize: 13, color: onSurface),
+              decoration: InputDecoration(
+                border: InputBorder.none,
+                hintText: '0.00',
+                hintStyle: TextStyle(
+                    fontSize: 13,
+                    color: onSurface.withOpacity(0.3)),
+                prefixIcon: Icon(Icons.euro_rounded,
+                    size: 18,
+                    color: onSurface.withOpacity(0.4)),
+                contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 14, vertical: 13),
+              ),
+              // Clear error when user starts typing
+              onChanged: (_) => setState(() => _error = null),
+            ),
+          ),
+
+          // ── Error message ──
+          if (_error != null) ...[
+            const SizedBox(height: 8),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: AppColors.redSoft,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Text(_error!,
+                  style: const TextStyle(
+                      color: AppColors.red, fontSize: 12)),
+            ),
+          ],
+
+          const SizedBox(height: 20),
+
+          // ── Save button ──
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: _save,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.accent,
+                foregroundColor: Colors.white,
+                minimumSize: const Size(double.infinity, 48),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14)),
+                elevation: 0,
+              ),
+              child: const Text('Save Budget',
+                  style: TextStyle(
+                      fontSize: 13, fontWeight: FontWeight.w600)),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -2,10 +2,11 @@ import 'package:fintak/core/constants/app_colors.dart';
 import 'package:fintak/features/budget/viewmodels/budget_viewmodel.dart';
 import 'package:fintak/features/budget/widegts/category_helpers.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class CategoryBudgetCard extends StatelessWidget {
   final CategoryBudgetItem item;
-  final VoidCallback onDelete;
+  final VoidCallback onDelete; // called when user confirms delete
 
   const CategoryBudgetCard({
     super.key,
@@ -17,108 +18,127 @@ class CategoryBudgetCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final onSurface = Theme.of(context).colorScheme.onSurface;
+    final formatter = NumberFormat.currency(symbol: '\$', decimalDigits: 2);
 
-    // Capitalize first letter of category name
-    final categoryLabel = item.category.name[0].toUpperCase() + item.category.name.substring(1);
-    
-    // Get shared configuration assets
-    final iconData = getCategoryIcon(item.category);
+    // Get icon and colors for this category from shared helper
+    final icon = getCategoryIcon(item.category);
     final (bgColor, iconColor) = getCategoryColors(item.category);
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+    // Capitalize the category name for display
+    final categoryLabel = item.category.name[0].toUpperCase() +
+        item.category.name.substring(1);
+
+    return GestureDetector(
+      // Long press triggers delete confirmation
+      onLongPress: onDelete,
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+          ),
         ),
-      ),
-      child: InkWell(
-        onLongPress: onDelete,
-        borderRadius: BorderRadius.circular(16),
-        child: Padding(
-          padding: const EdgeInsets.all(14),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Row 1 — Icon + Info + Trailing Badge
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center, // Aligns elements strictly to center line
-                children: [
-                  // Category design asset wrapper
-                  Container(
-                    width: 38,
-                    height: 38,
-                    decoration: BoxDecoration(
-                      color: bgColor,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(iconData, color: iconColor, size: 20),
+        child: Column(
+          children: [
+
+            // ── Top row: icon + name + badge ──
+            Row(
+              children: [
+
+                // Category icon with colored background
+                Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: bgColor,
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                  const SizedBox(width: 12),
-                  
-                  // Text details layout expanding space dynamically
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          categoryLabel,
-                          style: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        const SizedBox(height: 3),
-                        Text(
-                          '\$${item.spent.toStringAsFixed(0)} spent of \$${item.budgetLimit.toStringAsFixed(0)}',
+                  child: Center(
+                    child: Icon(icon, color: iconColor, size: 15),
+                  ),
+                ),
+
+                const SizedBox(width: 10),
+
+                // Category name + spent vs limit
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(categoryLabel,
                           style: TextStyle(
-                            fontSize: 11,
-                            color: onSurface.withOpacity(0.5),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  
-                  // Trailing status badge pill container
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: item.isOverBudget ? AppColors.redSoft : AppColors.greenSoft,
-                      borderRadius: BorderRadius.circular(99),
-                    ),
-                    child: Text(
-                      item.isOverBudget ? 'Over' : '${(item.percentage * 100).toStringAsFixed(0)}%',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                        color: item.isOverBudget ? AppColors.red : AppColors.green,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: onSurface)),
+                      const SizedBox(height: 2),
+                      Text(
+                        // e.g. "€87.00 of €350.00"
+                        '${formatter.format(item.spent)} of ${formatter.format(item.budgetLimit)}',
+                        style: TextStyle(
+                            fontSize: 10,
+                            color: onSurface.withOpacity(0.5)),
                       ),
-                    ),
+                    ],
                   ),
-                ],
-              ),
-              
-              const SizedBox(height: 12),
-              
-              // Row 2 — Standard progress status bar
-              SizedBox(
-                height: 5,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(99),
-                  child: LinearProgressIndicator(
-                    value: item.percentage,
-                    backgroundColor: isDark ? AppColors.darkBorder : AppColors.lightBorder,
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      item.isOverBudget ? AppColors.red : AppColors.accent,
+                ),
+
+                // Badge — red "Over" or green percentage
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 10, vertical: 3),
+                  decoration: BoxDecoration(
+                    // Red background if over, green if on track
+                    color: item.isOverBudget
+                        ? AppColors.redSoft
+                        : AppColors.greenSoft,
+                    borderRadius: BorderRadius.circular(99),
+                  ),
+                  child: Text(
+                    item.isOverBudget
+                        ? 'Over'
+                        : '${(item.percentage * 100).toStringAsFixed(0)}%',
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                      color: item.isOverBudget
+                          ? AppColors.red
+                          : AppColors.green,
                     ),
                   ),
                 ),
+              ],
+            ),
+
+            const SizedBox(height: 10),
+
+            // ── Progress bar ──
+            ClipRRect(
+              borderRadius: BorderRadius.circular(99),
+              child: LinearProgressIndicator(
+                // percentage is already clamped 0.0-1.0 in the getter
+                value: item.percentage,
+                minHeight: 5,
+                backgroundColor:
+                    isDark ? AppColors.darkBorder : AppColors.lightBorder,
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  // Red if over, accent purple if on track
+                  item.isOverBudget ? AppColors.red : AppColors.accent,
+                ),
               ),
-            ],
-          ),
+            ),
+
+            // Hint text for long press delete
+            const SizedBox(height: 6),
+            Text(
+              'Long press to delete',
+              style: TextStyle(
+                fontSize: 9,
+                color: onSurface.withOpacity(0.25),
+              ),
+            ),
+          ],
         ),
       ),
     );

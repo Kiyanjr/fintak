@@ -8,7 +8,7 @@ final LocalDatasource _dataSource;
 BudgetRepository(this._dataSource);
 final List<BudgetModel> _budgets=[];
 
-Future <List<BudgetModel>> getBidgets()async{
+Future <List<BudgetModel>> getBudgets()async{
   return await _dataSource.getBudgets();
 }
     /*   SAVE BUDGET
