@@ -21,7 +21,7 @@ class CategoryBudgetItem {
   // calculation getter
   double get remaining => budgetLimit - spent;
 
-  // controling % range between 0.0 to 0.1 hleps to prevent overflowing the graphic
+  // controling % range between 0.0 to 0.1 hleps to prevent overflowing the graphic(>%100)
   double get percentage =>
       (budgetLimit == 0) ? 0.0 : (spent / budgetLimit).clamp(0.0, 1.0);
 

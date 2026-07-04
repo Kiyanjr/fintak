@@ -11,13 +11,16 @@ class TransactionTile extends StatelessWidget {
   IconData _getCategoryIcon(TransactionCategory category) {
     return switch (category) {
       TransactionCategory.food => Icons.restaurant_rounded,
+      TransactionCategory.income => Icons.attach_money_rounded,
       TransactionCategory.transport => Icons.directions_car_rounded,
       TransactionCategory.entertainment => Icons.sports_esports_rounded,
       TransactionCategory.shopping => Icons.shopping_bag_rounded,
+      TransactionCategory.housing => Icons.house_rounded,
       TransactionCategory.salary => Icons.work_rounded,
       TransactionCategory.freelance => Icons.laptop_mac_rounded,
       TransactionCategory.health => Icons.favorite_border_rounded,
       TransactionCategory.other => Icons.more_horiz_rounded,
+      TransactionCategory.utilities => Icons.water_drop_rounded,
     };
   }
 
@@ -28,6 +31,10 @@ class TransactionTile extends StatelessWidget {
       TransactionCategory.transport => (
         AppColors.catTransportBg,
         AppColors.catTransport,
+      ),
+      TransactionCategory.income => (
+        AppColors.catincomeBg,
+        AppColors.catincome,
       ),
       TransactionCategory.entertainment => (
         AppColors.catEntertainBg,
@@ -44,6 +51,14 @@ class TransactionTile extends StatelessWidget {
       TransactionCategory.salary => (
         AppColors.catSalaryBg,
         AppColors.catSalary,
+      ),
+      TransactionCategory.housing => (
+        AppColors.catHousingBg,
+        AppColors.catHousing,
+      ),
+      TransactionCategory.utilities => (
+        AppColors.catutilitiesBg,
+        AppColors.catutilities,
       ),
       TransactionCategory.freelance => (
         AppColors.catFreelanceBg,

@@ -10,7 +10,7 @@ enum TransactionCategory {
   shopping,
   salary,
   freelance,
-  other,
+  other, housing, utilities, income,
 }
 
 enum TransactionType { income, expense }
