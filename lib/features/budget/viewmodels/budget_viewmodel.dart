@@ -4,12 +4,6 @@ import 'package:fintak/data/repositories/budget_repository.dart';
 import 'package:fintak/data/repositories/transaction_repository.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../data/models/transaction_model.dart';
-import '../../../data/models/budget_model.dart';
-import '../../../data/repositories/transaction_repository.dart';
-import '../../../data/repositories/budget_repository.dart';
-
 // ─────────────────────────────────────────────
 // CategoryBudgetItem
 // A computed object combining BudgetModel + actual spending
