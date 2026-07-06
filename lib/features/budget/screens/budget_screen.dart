@@ -2,7 +2,7 @@ import 'package:fintak/core/constants/app_colors.dart';
 import 'package:fintak/data/models/transaction_model.dart';
 import 'package:fintak/features/budget/viewmodels/budget_viewmodel.dart';
 import 'package:fintak/features/budget/viewmodels/category_budget_card.dart';
-import 'package:fintak/features/budget/widegts/budget_summer.dart';
+import 'package:fintak/features/budget/widegts/budget_summar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -13,7 +13,6 @@ class BudgetScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final budgetState = ref.watch(budgetViewModelProvider);
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final onSurface = Theme.of(context).colorScheme.onSurface;
 
     // Show spinner while loading
