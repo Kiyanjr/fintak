@@ -30,8 +30,7 @@ class StatsSummaryCard extends StatelessWidget {
     final formatter = NumberFormat.currency(symbol: '\$', decimalDigits: 2);
     return GridView.count(
       crossAxisCount: 2, //Splits the grid into exactly two columns.
-      crossAxisSpacing:
-          10, //Puts a 10-pixel gap horizontally between the two columns.
+      crossAxisSpacing: 10, //Puts a 10-pixel gap horizontally between the two columns.
       mainAxisSpacing: 10, //: Puts a 10-pixel gap vertically between the rows.
       childAspectRatio: 1.6, // controls how tall each card is
       shrinkWrap: true, // insidce a scroll view
