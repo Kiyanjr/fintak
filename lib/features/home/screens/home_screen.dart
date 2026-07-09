@@ -4,6 +4,7 @@ import 'package:fintak/features/home/widgets/add_transaction_sheet.dart';
 import 'package:fintak/features/home/widgets/balance_card.dart';
 import 'package:fintak/features/home/widgets/spending_chart.dart';
 import 'package:fintak/features/home/widgets/transaction_list.dart';
+import 'package:fintak/features/stats/viewmodels/stats_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -20,7 +21,7 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final homeState = ref.watch(homeViewmodelProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
-
+    final monthlySpendingChart=ref.watch(statsViewModelProvider.select((s)=>s.monthlySpending));
     //  if database is loading
     if (homeState.isLoading) {
       return const Scaffold(
@@ -117,7 +118,7 @@ class HomeScreen extends ConsumerWidget {
                 const SizedBox(height: 14),
                 //      hard coded fix later
                 SpendingChart(
-                  monthlyTotals: const [450, 720, 540, 880, 640, 1920],
+                  monthlyTotals: monthlySpendingChart,
                 ),
 
                 const SizedBox(height: 20),

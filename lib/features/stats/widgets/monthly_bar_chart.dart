@@ -43,7 +43,10 @@ class monthlyBarChart extends StatelessWidget {
                   color: isDark ? AppColors.accentDark : AppColors.accent,
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Text('6'),
+                child:  Text('${monthlySpendings.length}M',
+                style: TextStyle(color:Colors.white),
+                 
+                ),
               ),
             ],
           ),
@@ -102,10 +105,14 @@ class monthlyBarChart extends StatelessWidget {
                 ),
                  // logic of touching the border
                 barTouchData: BarTouchData(
+                  // toching shows popup wuth black background
                   touchTooltipData: BarTouchTooltipData(
                     getTooltipColor: (group) => Colors.black87,
+                    // Touched chart items
                     getTooltipItem: (group, groupIndex, rod, rodIndex) {
                       return BarTooltipItem(
+                        // rod.yoY  height of column
+                        // Column is zero created small tiny to show it empy
                         '\$${rod.toY == 0.5 ? "0" : rod.toY.toStringAsFixed(0)}}',
                         const TextStyle(
                           color: Colors.white,
@@ -116,7 +123,9 @@ class monthlyBarChart extends StatelessWidget {
                     },
                   ),
                 ),
+                // Creating Column of charts
                 barGroups: List.generate(6, (i) {
+                  // Last Cloumn or current month
                   final isCurrentMonth = i == 5;
                   return BarChartGroupData(
                     x: i,
