@@ -5,10 +5,10 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-class monthlyBarChart extends StatelessWidget {
+class MonthlyBarChart extends StatelessWidget {
   final List<double> monthlySpendings;
 
-  const monthlyBarChart({super.key, required this.monthlySpendings});
+  const MonthlyBarChart({super.key, required this.monthlySpendings});
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
