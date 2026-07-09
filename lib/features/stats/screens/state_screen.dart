@@ -74,7 +74,7 @@ class StateScreen extends ConsumerWidget {
                 const SizedBox(height: 14),
 
                 // Monthly Spending Chart
-                monthlyBarChart(monthlySpendings: statsState.monthlySpending),
+                MonthlyBarChart(monthlySpendings: statsState.monthlySpending),
                 const SizedBox(height: 14),
 
                 // Category Donut Char
