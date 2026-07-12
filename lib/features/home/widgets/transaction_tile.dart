@@ -112,17 +112,33 @@ class TransactionTile extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  transaction.title,
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: onSurfaceColor,
-                  ),
-                  overflow: TextOverflow.ellipsis,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      transaction.title,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: onSurfaceColor,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      _formatAmount(transaction),
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: transaction.type == TransactionType.income
+                            ? Colors.green
+                            : const Color.fromARGB(255, 198, 14, 14),
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 2),
 
+                const SizedBox(height: 2),
                 Text(
                   _fromatDateAndCategory(transaction),
                   style: TextStyle(

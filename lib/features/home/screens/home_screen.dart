@@ -1,4 +1,5 @@
 import 'package:fintak/core/constants/app_colors.dart';
+import 'package:fintak/features/home/screens/all_transactions_screen.dart';
 import 'package:fintak/features/home/viewmodels/home_viewmodel.dart';
 import 'package:fintak/features/home/widgets/add_transaction_sheet.dart';
 import 'package:fintak/features/home/widgets/balance_card.dart';
@@ -21,7 +22,9 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final homeState = ref.watch(homeViewmodelProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final monthlySpendingChart=ref.watch(statsViewModelProvider.select((s)=>s.monthlySpending));
+    final monthlySpendingChart = ref.watch(
+      statsViewModelProvider.select((s) => s.monthlySpending),
+    );
     //  if database is loading
     if (homeState.isLoading) {
       return const Scaffold(
@@ -117,9 +120,7 @@ class HomeScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 14),
                 //      hard coded fix later
-                SpendingChart(
-                  monthlyTotals: monthlySpendingChart,
-                ),
+                SpendingChart(monthlyTotals: monthlySpendingChart),
 
                 const SizedBox(height: 20),
                 // header of list tile
@@ -136,7 +137,11 @@ class HomeScreen extends ConsumerWidget {
                     ),
                     TextButton(
                       onPressed: () {
-                        //  later: add navigation
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const AllTransactionsScreen(),
+                          ),
+                        );
                       },
                       child: Text(
                         'See all',
