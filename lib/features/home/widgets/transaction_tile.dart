@@ -5,7 +5,13 @@ import 'package:intl/intl.dart';
 
 class TransactionTile extends StatelessWidget {
   final TransactionModel transaction;
-  const TransactionTile({super.key, required this.transaction});
+  final VoidCallback? onDelete;
+  
+  const TransactionTile({
+    super.key, 
+    required this.transaction,
+    this.onDelete,
+  });
 
   //  Maping enums nto icons
   IconData _getCategoryIcon(TransactionCategory category) {
@@ -82,11 +88,27 @@ class TransactionTile extends StatelessWidget {
     return '$prefix${formatter.format(transaction.amount)}';
   }
 
+  Widget _buildDeleteBackground() {
+    return Container(
+      alignment: Alignment.centerRight,
+      padding: const EdgeInsets.only(right: 20),
+      decoration: BoxDecoration(
+        color: const Color.fromARGB(255, 198, 14, 14),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: const Icon(
+        Icons.delete_rounded,
+        color: Colors.white,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final onSurfaceColor = Theme.of(context).colorScheme.onSurface;
     final (bgColor, iconColor) = _getCategoryColors(transaction.category);
-    return Padding(
+
+    final tile = Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 10),
       child: Row(
         children: [
@@ -106,7 +128,7 @@ class TransactionTile extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(width: 11),
+          const SizedBox(width: 11),
           // Title + date column
           Expanded(
             child: Column(
@@ -115,13 +137,15 @@ class TransactionTile extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      transaction.title,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: onSurfaceColor,
+                    Expanded(
+                      child: Text(
+                        transaction.title,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: onSurfaceColor,
+                        ),
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -151,6 +175,16 @@ class TransactionTile extends StatelessWidget {
           ),
         ],
       ),
+    );
+
+    if (onDelete == null) return tile;
+
+    return Dismissible(
+      key: Key(transaction.id),
+      direction: DismissDirection.endToStart,
+      background: _buildDeleteBackground(),
+      onDismissed: (_) => onDelete?.call(),
+      child: tile,
     );
   }
 }

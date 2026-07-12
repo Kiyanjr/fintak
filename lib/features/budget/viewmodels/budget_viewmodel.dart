@@ -4,105 +4,78 @@ import 'package:fintak/data/repositories/budget_repository.dart';
 import 'package:fintak/data/repositories/transaction_repository.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
-// ─────────────────────────────────────────────
-// CategoryBudgetItem
-// A computed object combining BudgetModel + actual spending
-// This is NOT saved anywhere — created fresh every time loadBudgets() runs
-// ─────────────────────────────────────────────
+// Represents one category item in the budget list
 class CategoryBudgetItem {
-  final String budgetId;         // id of the BudgetModel — needed for delete
+  final String budgetId;
   final TransactionCategory category;
-  final double budgetLimit;      // the max the user set
-  final double spent;            // how much actually spent this month
+  final double budgetLimit;
+  final double spent;
 
-  const CategoryBudgetItem({
+  CategoryBudgetItem({
     required this.budgetId,
     required this.category,
     required this.budgetLimit,
     required this.spent,
   });
 
-  // How much is left — can be negative if over budget
   double get remaining => budgetLimit - spent;
 
-  // Percentage spent — clamped so it never visually exceeds 100%
-  double get percentage => budgetLimit == 0
-      ? 0.0
-      : (spent / budgetLimit).clamp(0.0, 1.0);
+  double get percentage =>
+      budgetLimit == 0 ? 0.0 : (spent / budgetLimit).clamp(0.0, 1.0);
 
-  // Simple flag the UI uses to show red vs green
   bool get isOverBudget => spent > budgetLimit;
 }
 
-// ─────────────────────────────────────────────
-// BudgetState
-// Everything the Budget screen needs at any moment
-// ─────────────────────────────────────────────
+// Holds the full screen state for the Budget screen
 class BudgetState {
-  final List<CategoryBudgetItem> categoryItems;
-  final double totalBudget;   // sum of all budget limits
-  final double totalSpent;    // sum of all expense transactions this month
   final bool isLoading;
+  final double totalBudget;
+  final double totalSpent;
+  final List<CategoryBudgetItem> categoryItems;
   final String? errorMessage;
-  final int currentMonth;
-  final int currentYear;
 
-  static const _sentinel = Object();
-
-  const BudgetState({
-    this.categoryItems = const [],
+  BudgetState({
+    this.isLoading = false,
     this.totalBudget = 0.0,
     this.totalSpent = 0.0,
-    this.isLoading = true,
+    this.categoryItems = const [],
     this.errorMessage,
-    int? currentMonth,
-    int? currentYear,
-  })  : currentMonth = currentMonth ?? 0,
-        currentYear = currentYear ?? 0;
+  });
+
+  double get totalRemaining => totalBudget - totalSpent;
+
+  double get totalPercentage =>
+      totalBudget == 0 ? 0.0 : (totalSpent / totalBudget).clamp(0.0, 1.0);
 
   BudgetState copyWith({
-    List<CategoryBudgetItem>? categoryItems,
+    bool? isLoading,
     double? totalBudget,
     double? totalSpent,
-    bool? isLoading,
-    Object? errorMessage = _sentinel,
-    int? currentMonth,
-    int? currentYear,
+    List<CategoryBudgetItem>? categoryItems,
+    String? errorMessage,
   }) {
     return BudgetState(
-      categoryItems: categoryItems ?? this.categoryItems,
+      isLoading: isLoading ?? this.isLoading,
       totalBudget: totalBudget ?? this.totalBudget,
       totalSpent: totalSpent ?? this.totalSpent,
-      isLoading: isLoading ?? this.isLoading,
-      // sentinel pattern — lets us explicitly set errorMessage back to null
-      errorMessage: errorMessage == _sentinel
-          ? this.errorMessage
-          : errorMessage as String?,
-      currentMonth: currentMonth ?? this.currentMonth,
-      currentYear: currentYear ?? this.currentYear,
+      categoryItems: categoryItems ?? this.categoryItems,
+      errorMessage: errorMessage,
     );
   }
 }
 
-// ─────────────────────────────────────────────
-// BudgetViewModel
-// Manages all budget logic — loading, adding, deleting
-// ─────────────────────────────────────────────
 class BudgetViewModel extends StateNotifier<BudgetState> {
-  final TransactionRepository _transactionRepository;
   final BudgetRepository _budgetRepository;
+  final TransactionRepository _transactionRepository;
 
-  BudgetViewModel(this._transactionRepository, this._budgetRepository)
-      : super(BudgetState(
-          currentMonth: DateTime.now().month,
-          currentYear: DateTime.now().year,
-        )) {
-    // Load immediately when ViewModel is created
+  BudgetViewModel(
+    this._budgetRepository,
+    this._transactionRepository,
+  ) : super(BudgetState()) {
     loadBudgets();
   }
 
-  // ── LOAD ──────────────────────────────────
-  // Main method — loads transactions + budgets, calculates everything
+  // Load budgets and calculate spent amounts for current month
   Future<void> loadBudgets() async {
     state = state.copyWith(isLoading: true, errorMessage: null);
 
@@ -111,23 +84,22 @@ class BudgetViewModel extends StateNotifier<BudgetState> {
       final currentMonth = now.month;
       final currentYear = now.year;
 
-      // Load both lists at the same time — faster than awaiting one by one
-      final results = await Future.wait([
-        _transactionRepository.getTransactions(),
-        _budgetRepository.getBudgets(),
-      ]);
+      final allBudgets = await _budgetRepository.getBudgets();
+      final allTransactions = await _transactionRepository.getTransactions();
 
-      final transactions = results[0] as List<TransactionModel>;
-      final budgets = results[1] as List<BudgetModel>;
+      // Filter budgets for the current month and year only
+      final currentMonthBudgets = allBudgets.where((b) =>
+          b.month == currentMonth && b.year == currentYear).toList();
 
-      // Only care about expense transactions in the current month
-      final thisMonthExpenses = transactions.where((t) =>
-          t.type == TransactionType.expense &&
-          t.date.month == currentMonth &&
-          t.date.year == currentYear).toList();
+      // Filter transactions for the current month
+      final thisMonthExpenses = allTransactions.where((t) {
+        return t.date.month == currentMonth &&
+            t.date.year == currentYear &&
+            t.type == TransactionType.expense;
+      }).toList();
 
-      // For each budget, calculate how much was spent in that category this month
-      final categoryItems = budgets.map((budget) {
+      // Map each budget into a CategoryBudgetItem
+      final categoryItems = currentMonthBudgets.map((budget) {
         final spent = thisMonthExpenses
             .where((t) => t.category == budget.category)
             .fold(0.0, (sum, t) => sum + t.amount);
@@ -140,81 +112,68 @@ class BudgetViewModel extends StateNotifier<BudgetState> {
         );
       }).toList();
 
-      // Sort — over budget items appear at the top
-      categoryItems.sort((a, b) {
-        if (a.isOverBudget && !b.isOverBudget) return -1;
-        if (!a.isOverBudget && b.isOverBudget) return 1;
-        return 0;
-      });
-
-      // Total budget = sum of all limits
       final totalBudget =
-          budgets.fold(0.0, (sum, b) => sum + b.limit);
+          categoryItems.fold(0.0, (sum, item) => sum + item.budgetLimit);
 
-      // Total spent = sum of ALL expense transactions this month
-      // (not just ones with a budget set)
       final totalSpent =
           thisMonthExpenses.fold(0.0, (sum, t) => sum + t.amount);
 
       state = state.copyWith(
-        categoryItems: categoryItems,
+        isLoading: false,
         totalBudget: totalBudget,
         totalSpent: totalSpent,
-        isLoading: false,
-        currentMonth: currentMonth,
-        currentYear: currentYear,
+        categoryItems: categoryItems,
       );
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Failed to load budgets. Please try again.',
+        errorMessage: 'Failed to load budgets.',
       );
     }
   }
 
-  // ── ADD OR UPDATE ──────────────────────────
-  // If a budget already exists for this category+month+year → update its limit
-  // If not → create a new one
+  // Add or update a category budget for the current month
   Future<void> addOrUpdateBudget(
       TransactionCategory category, double limit) async {
     try {
-      final budgets = await _budgetRepository.getBudgets();
+      final now = DateTime.now();
+      final budget = BudgetModel(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        category: category,
+        limit: limit,
+        month: now.month,
+        year: now.year,
+      );
 
-      // Check if a budget already exists for this category this month
-      final existing = budgets.where((b) =>
-          b.category == category &&
-          b.month == DateTime.now().month &&
-          b.year == DateTime.now().year).firstOrNull;
-
-      if (existing != null) {
-        // Update the existing one with the new limit
-        final updated = existing.copyWith(limit: limit);
-        await _budgetRepository.updateBudget(existing.id,updated);
-      } else {
-        // Create a brand new budget
-        final newBudget = BudgetModel(
-          category: category,
-          limit: limit,
-          month: DateTime.now().month,
-          year: DateTime.now().year,
-        );
-        await _budgetRepository.saveBudget(newBudget);
-      }
-
-      // Reload to reflect changes
+      await _budgetRepository.saveBudget(budget);
       await loadBudgets();
     } catch (e) {
       state = state.copyWith(
-        errorMessage: 'Failed to save budget. Please try again.',
+        errorMessage: 'Failed to save budget.',
       );
     }
   }
 
-  // ── DELETE ─────────────────────────────────
+  // Delete a budget by ID with immediate optimistic UI update
   Future<void> deleteBudget(String budgetId) async {
     try {
+      //  Optimistic UI update: remove item locally first so UI responds instantly
+      final updatedItems = state.categoryItems
+          .where((item) => item.budgetId != budgetId)
+          .toList();
+
+      final newTotalBudget =
+          updatedItems.fold(0.0, (sum, b) => sum + b.budgetLimit);
+
+      state = state.copyWith(
+        categoryItems: updatedItems,
+        totalBudget: newTotalBudget,
+      );
+
+      //  Perform actual deletion in the repository
       await _budgetRepository.deleteBudget(budgetId);
-      // Reload to reflect deletion
+
+      //  Sync state with the repository
       await loadBudgets();
     } catch (e) {
       state = state.copyWith(
@@ -224,12 +183,9 @@ class BudgetViewModel extends StateNotifier<BudgetState> {
   }
 }
 
-// ─────────────────────────────────────────────
-// Provider
-// ─────────────────────────────────────────────
 final budgetViewModelProvider =
     StateNotifierProvider<BudgetViewModel, BudgetState>((ref) {
-  final transactionRepo = ref.watch(transactionRepositoryProvider);
   final budgetRepo = ref.watch(budgetRepositoryProvider);
-  return BudgetViewModel(transactionRepo, budgetRepo);
+  final transactionRepo = ref.watch(transactionRepositoryProvider);
+  return BudgetViewModel(budgetRepo, transactionRepo);
 });

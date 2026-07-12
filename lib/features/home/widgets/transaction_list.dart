@@ -5,11 +5,19 @@ import 'package:flutter/material.dart';
 
 class TransactionList extends StatelessWidget {
   final List<TransactionModel> transactions;
-  const TransactionList({super.key, required this.transactions});
+  final void Function(String id)? onDelete;
+
+  const TransactionList({
+    super.key,
+    required this.transactions,
+    this.onDelete,
+  });
+
   @override
   Widget build(BuildContext context) {
-    final isDark= Theme.of(context).brightness==Brightness.dark;
-    final dividerColor= isDark ? AppColors.darkBorder : AppColors.lightBorder;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final dividerColor = isDark ? AppColors.darkBorder : AppColors.lightBorder;
+
     if (transactions.isEmpty) {
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 30),
@@ -33,22 +41,28 @@ class TransactionList extends StatelessWidget {
           ),
         ),
       );
-    } 
-     //   last item in the column wont have divider  last from up to down
+    }
+
+    // last item in the column wont have divider last from up to down
     return Column(
-        //  Walk through the logic: if you have 3 transactions, you need 3 tiles + 2
-        children: List.generate(
-          transactions.length *2 -1,  // total widgets we need (items and divider)
-        (index){
-            if(index.isOdd){   //  find where to add divider
-                // Odd indexs hacing horizantal divider line
-                return Divider(height: 1,color: dividerColor);
-            }
-              // for returning true transactions items index
-              final transactionIndex=index ~/2;
-              return TransactionTile(transaction: transactions[transactionIndex],);
-        }
-    )
+      // Walk through the logic: if you have 3 transactions, you need 3 tiles + 2 dividers
+      children: List.generate(
+        transactions.length * 2 - 1, // total widgets we need (items and divider)
+        (index) {
+          if (index.isOdd) {
+            // Odd indexs having horizontal divider line
+            return Divider(height: 1, color: dividerColor);
+          }
+          // for returning true transactions items index
+          final transactionIndex = index ~/ 2;
+          final transaction = transactions[transactionIndex];
+
+          return TransactionTile(
+            transaction: transaction,
+            onDelete: onDelete != null ? () => onDelete!(transaction.id) : null, // اصلاح شد
+          );
+        },
+      ),
     );
   }
 }
