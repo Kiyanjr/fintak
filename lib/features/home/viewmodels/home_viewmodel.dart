@@ -1,5 +1,8 @@
 import 'package:fintak/data/models/transaction_model.dart';
 import 'package:fintak/data/repositories/transaction_repository.dart';
+import 'package:fintak/features/budget/viewmodels/budget_viewmodel.dart';
+import 'package:fintak/features/stats/viewmodels/stats_viewmodel.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
 class HomeState {
@@ -33,7 +36,8 @@ class HomeState {
 
 class HomeViewmodel extends StateNotifier<HomeState> {
   final TransactionRepository _transactionRepository;
-  HomeViewmodel({required this._transactionRepository})
+  final Ref _ref;
+  HomeViewmodel(this._ref, {required this._transactionRepository})
     : super(const HomeState()) {
     loadTransactions();
   }
@@ -64,9 +68,20 @@ class HomeViewmodel extends StateNotifier<HomeState> {
       state = state.copyWith(isLoading: false);
     }
   }
+ // Delete funcation
+ Future<void> deleteTransaction(String id) async{
+  await _transactionRepository.deleteTransaction(id);
+  // Reload everything after deletion
+  await loadTransactions();
+    // Keep budget and stats in sync
+  _ref.read(budgetViewModelProvider.notifier).loadBudgets();
+  _ref.read(statsViewModelProvider.notifier).refresh();
+ }
+
+
 }
 
 final homeViewmodelProvider=StateNotifierProvider<HomeViewmodel,HomeState>((ref){
 final repository=ref.watch(transactionRepositoryProvider);
-return HomeViewmodel(transactionRepository: repository);
+return HomeViewmodel(transactionRepository: repository,ref);
 });

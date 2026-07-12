@@ -37,6 +37,7 @@ Future<void> saveBudget(BudgetModel budget) async {
   }
 Future<void> deleteBudget(String id)async{
   final budgets=await _dataSource.getBudgets();
+  budgets.removeWhere((budget)=>budget.id==id);
   _budgets.removeWhere((budget)=>budget.id==id);
   await _dataSource.saveBudgets(budgets);
 

@@ -98,6 +98,7 @@ class BudgetScreen extends ConsumerWidget {
                                   padding:
                                       const EdgeInsets.only(bottom: 10),
                                   child: CategoryBudgetCard(
+                                    key: ValueKey(item.budgetId), // Added Key to fix UI update issues on delete
                                     item: item,
                                     // Pass delete callback — shows confirm dialog
                                     onDelete: () => _confirmDelete(

@@ -153,6 +153,7 @@ class HomeScreen extends ConsumerWidget {
                 // only the 5 recents are showing
                 TransactionList(
                   transactions: homeState.transactions.take(5).toList(),
+                  onDelete: (id) => ref.read(homeViewmodelProvider.notifier).deleteTransaction(id),
                 ),
               ], // last
             ),
