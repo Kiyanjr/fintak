@@ -1,5 +1,7 @@
+import 'package:fintak/data/datasources/local_datasource.dart';
 import 'package:fintak/data/models/budget_model.dart';
 import 'package:fintak/data/models/transaction_model.dart';
+import 'package:fintak/data/models/user_model.dart';
 import 'package:fintak/data/repositories/budget_repository.dart';
 import 'package:fintak/data/repositories/transaction_repository.dart';
 import 'package:flutter_riverpod/legacy.dart';
@@ -31,6 +33,7 @@ class BudgetState {
   final bool isLoading;
   final double totalBudget;
   final double totalSpent;
+  final double overallMonthlyBudget; // Overall budget set during signup
   final List<CategoryBudgetItem> categoryItems;
   final String? errorMessage;
 
@@ -38,6 +41,7 @@ class BudgetState {
     this.isLoading = false,
     this.totalBudget = 0.0,
     this.totalSpent = 0.0,
+    this.overallMonthlyBudget = 0.0,
     this.categoryItems = const [],
     this.errorMessage,
   });
@@ -51,6 +55,7 @@ class BudgetState {
     bool? isLoading,
     double? totalBudget,
     double? totalSpent,
+    double? overallMonthlyBudget,
     List<CategoryBudgetItem>? categoryItems,
     String? errorMessage,
   }) {
@@ -58,6 +63,8 @@ class BudgetState {
       isLoading: isLoading ?? this.isLoading,
       totalBudget: totalBudget ?? this.totalBudget,
       totalSpent: totalSpent ?? this.totalSpent,
+      overallMonthlyBudget:
+          overallMonthlyBudget ?? this.overallMonthlyBudget,
       categoryItems: categoryItems ?? this.categoryItems,
       errorMessage: errorMessage,
     );
@@ -67,10 +74,12 @@ class BudgetState {
 class BudgetViewModel extends StateNotifier<BudgetState> {
   final BudgetRepository _budgetRepository;
   final TransactionRepository _transactionRepository;
+  final LocalDatasource _localDataSource;
 
   BudgetViewModel(
     this._budgetRepository,
     this._transactionRepository,
+    this._localDataSource,
   ) : super(BudgetState()) {
     loadBudgets();
   }
@@ -86,6 +95,9 @@ class BudgetViewModel extends StateNotifier<BudgetState> {
 
       final allBudgets = await _budgetRepository.getBudgets();
       final allTransactions = await _transactionRepository.getTransactions();
+      final user = await _localDataSource.getUser(); // Fetch user for monthly budget
+
+      final overallMonthlyBudget = user?.monthlyBudget ?? 0.0;
 
       // Filter budgets for the current month and year only
       final currentMonthBudgets = allBudgets.where((b) =>
@@ -122,6 +134,7 @@ class BudgetViewModel extends StateNotifier<BudgetState> {
         isLoading: false,
         totalBudget: totalBudget,
         totalSpent: totalSpent,
+        overallMonthlyBudget: overallMonthlyBudget,
         categoryItems: categoryItems,
       );
     } catch (e) {
@@ -157,7 +170,7 @@ class BudgetViewModel extends StateNotifier<BudgetState> {
   // Delete a budget by ID with immediate optimistic UI update
   Future<void> deleteBudget(String budgetId) async {
     try {
-      //  Optimistic UI update: remove item locally first so UI responds instantly
+      // Optimistic UI update: remove item locally first so UI responds instantly
       final updatedItems = state.categoryItems
           .where((item) => item.budgetId != budgetId)
           .toList();
@@ -170,10 +183,10 @@ class BudgetViewModel extends StateNotifier<BudgetState> {
         totalBudget: newTotalBudget,
       );
 
-      //  Perform actual deletion in the repository
+      // Perform actual deletion in the repository
       await _budgetRepository.deleteBudget(budgetId);
 
-      //  Sync state with the repository
+      // Sync state with the repository
       await loadBudgets();
     } catch (e) {
       state = state.copyWith(
@@ -187,5 +200,7 @@ final budgetViewModelProvider =
     StateNotifierProvider<BudgetViewModel, BudgetState>((ref) {
   final budgetRepo = ref.watch(budgetRepositoryProvider);
   final transactionRepo = ref.watch(transactionRepositoryProvider);
-  return BudgetViewModel(budgetRepo, transactionRepo);
+  final datasource = ref.watch(localDataSourceProvider).requireValue;
+
+  return BudgetViewModel(budgetRepo, transactionRepo, datasource);
 });

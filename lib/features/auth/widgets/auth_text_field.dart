@@ -12,6 +12,7 @@ class AuthTextField extends StatelessWidget {
     this.isPassword = false,
     this.onToggleVisibility,
     this.keynoardType = TextInputType.text,
+     this.controller,
   });
   final String lable;
   final String hint;
@@ -21,6 +22,7 @@ class AuthTextField extends StatelessWidget {
   final bool isPassword;
   final VoidCallback? onToggleVisibility;
   final TextInputType keynoardType;
+  final TextEditingController ? controller;
 
   @override
   Widget build(BuildContext context) {
@@ -45,6 +47,7 @@ class AuthTextField extends StatelessWidget {
             borderRadius: BorderRadius.circular(13),
           ),
           child: TextField(
+            controller: controller,
             onChanged: onChanged,
             obscureText: isPassword && !isPasswordVisible,
             keyboardType: keynoardType,

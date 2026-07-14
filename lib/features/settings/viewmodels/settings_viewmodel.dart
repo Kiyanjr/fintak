@@ -92,6 +92,11 @@ class SettingsViewmodel extends StateNotifier<SettingsState> {
     await ref.read(authViewModelProvider.notifier).signOut(ref);
     //No navigation needed — the router detects currentUserId is null and automatically redirects to /login
   }
+  // Updates selected currency in state
+// Persistence can be added to LocalDataSource later
+Future<void> updateCurrency(String currency) async {
+  state = state.copyWith(selectedCurrency: currency);
+}
 }
 
  // Provider Definition

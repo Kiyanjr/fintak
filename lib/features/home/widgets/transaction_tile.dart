@@ -6,14 +6,16 @@ import 'package:intl/intl.dart';
 class TransactionTile extends StatelessWidget {
   final TransactionModel transaction;
   final VoidCallback? onDelete;
-  
+  final VoidCallback? onEdit; // Added optional edit callback
+
   const TransactionTile({
     super.key, 
     required this.transaction,
     this.onDelete,
+    this.onEdit, // Default is null
   });
 
-  //  Maping enums nto icons
+  // Maping enums into icons
   IconData _getCategoryIcon(TransactionCategory category) {
     return switch (category) {
       TransactionCategory.food => Icons.restaurant_rounded,
@@ -30,7 +32,7 @@ class TransactionTile extends StatelessWidget {
     };
   }
 
-  // Out put of two backgorund colors and the icon colors,
+  // Output of two background colors and the icon colors
   (Color, Color) _getCategoryColors(TransactionCategory category) {
     return switch (category) {
       TransactionCategory.food => (AppColors.catFoodBg, AppColors.catFood),
@@ -108,7 +110,7 @@ class TransactionTile extends StatelessWidget {
     final onSurfaceColor = Theme.of(context).colorScheme.onSurface;
     final (bgColor, iconColor) = _getCategoryColors(transaction.category);
 
-    final tile = Padding(
+    final tileContent = Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 10),
       child: Row(
         children: [
@@ -161,7 +163,6 @@ class TransactionTile extends StatelessWidget {
                     ),
                   ],
                 ),
-
                 const SizedBox(height: 2),
                 Text(
                   _fromatDateAndCategory(transaction),
@@ -175,6 +176,11 @@ class TransactionTile extends StatelessWidget {
           ),
         ],
       ),
+    );
+
+    final tile = GestureDetector(
+      onLongPress: onEdit, // Added GestureDetector to handle onLongPress for edit trigger
+      child: tileContent,
     );
 
     if (onDelete == null) return tile;

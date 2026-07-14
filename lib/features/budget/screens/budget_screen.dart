@@ -14,7 +14,6 @@ class BudgetScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final budgetState = ref.watch(budgetViewModelProvider);
     final onSurface = Theme.of(context).colorScheme.onSurface;
-
     // Show spinner while loading
     if (budgetState.isLoading) {
       return const Scaffold(
@@ -74,7 +73,7 @@ class BudgetScreen extends ConsumerWidget {
 
                 // ── Summary cards (spent, remaining, progress bar) ──
                 BudgetSummaryCard(
-                  totalBudget: budgetState.totalBudget,
+                  totalBudget: budgetState.overallMonthlyBudget,
                   totalSpent: budgetState.totalSpent,
                 ),
 
@@ -253,7 +252,6 @@ class _AddBudgetSheetState extends State<_AddBudgetSheet> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final onSurface = Theme.of(context).colorScheme.onSurface;
-
     return Container(
       decoration: BoxDecoration(
         color: isDark ? AppColors.darkSurface : Colors.white,

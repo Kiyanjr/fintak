@@ -3,8 +3,10 @@ import 'package:fintak/features/home/screens/all_transactions_screen.dart';
 import 'package:fintak/features/home/viewmodels/home_viewmodel.dart';
 import 'package:fintak/features/home/widgets/add_transaction_sheet.dart';
 import 'package:fintak/features/home/widgets/balance_card.dart';
+import 'package:fintak/features/home/widgets/edit_transaction_sheet.dart';
 import 'package:fintak/features/home/widgets/spending_chart.dart';
 import 'package:fintak/features/home/widgets/transaction_list.dart';
+import 'package:fintak/features/settings/viewmodels/settings_viewmodel.dart';
 import 'package:fintak/features/stats/viewmodels/stats_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -20,6 +22,7 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final settingsState = ref.watch(settingsViewModelProvider);
     final homeState = ref.watch(homeViewmodelProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final monthlySpendingChart = ref.watch(
@@ -79,7 +82,11 @@ class HomeScreen extends ConsumerWidget {
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          'Kiyan DEV', // fix later
+                          settingsState.userName.isEmpty
+                              ? ' Hello '
+                              : settingsState.userName
+                                    .split(' ')
+                                    .first, // fix later
                           style: TextStyle(
                             fontSize: 17,
                             fontWeight: FontWeight.w700,
@@ -157,10 +164,19 @@ class HomeScreen extends ConsumerWidget {
                   ),
                   child: TransactionList(
                     transactions: homeState.transactions.take(5).toList(),
-                    onDelete: (id) => ref.read(homeViewmodelProvider.notifier).deleteTransaction(id),
+                    onDelete: (id) => ref
+                        .read(homeViewmodelProvider.notifier)
+                        .deleteTransaction(id),
+                    onEdit: (transaction) => showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                      builder: ((context) =>
+                          EditTransactionSheet(transaction: transaction)),
+                    ),
                   ),
                 ),
-              ], // 
+              ], //
             ),
           ),
         ),
