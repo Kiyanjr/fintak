@@ -77,7 +77,12 @@ class HomeViewmodel extends StateNotifier<HomeState> {
   _ref.read(budgetViewModelProvider.notifier).loadBudgets();
   _ref.read(statsViewModelProvider.notifier).refresh();
  }
-
+Future<void> updateTransaction(TransactionModel updated) async {
+  await _transactionRepository.updateTransaction(updated.id, updated);
+  await loadTransactions();
+  _ref.read(budgetViewModelProvider.notifier).loadBudgets();
+  _ref.read(statsViewModelProvider.notifier).refresh();
+}
 
 }
 

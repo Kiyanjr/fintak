@@ -1,5 +1,6 @@
 import 'package:fintak/core/constants/app_colors.dart';
 import 'package:fintak/features/home/viewmodels/home_viewmodel.dart';
+import 'package:fintak/features/home/widgets/edit_transaction_sheet.dart';
 import 'package:fintak/features/home/widgets/transaction_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -44,6 +45,13 @@ class AllTransactionsScreen extends ConsumerWidget {
                 onDelete: (id) => ref
                     .read(homeViewmodelProvider.notifier)
                     .deleteTransaction(id),
+                onEdit: (transaction) => showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  builder: (context) =>
+                      EditTransactionSheet(transaction: transaction),
+                ),
               ),
       ),
     );

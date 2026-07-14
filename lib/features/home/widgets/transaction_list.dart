@@ -6,11 +6,12 @@ import 'package:flutter/material.dart';
 class TransactionList extends StatelessWidget {
   final List<TransactionModel> transactions;
   final void Function(String id)? onDelete;
-
+  final void Function(TransactionModel transaction)? onEdit;
   const TransactionList({
     super.key,
     required this.transactions,
     this.onDelete,
+    this.onEdit,
   });
 
   @override
@@ -59,7 +60,8 @@ class TransactionList extends StatelessWidget {
 
           return TransactionTile(
             transaction: transaction,
-            onDelete: onDelete != null ? () => onDelete!(transaction.id) : null, // اصلاح شد
+            onDelete: onDelete != null ? () => onDelete!(transaction.id) : null, 
+            onEdit: onEdit != null ? () => onEdit!(transaction) : null, // Passed to tile
           );
         },
       ),

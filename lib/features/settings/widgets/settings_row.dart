@@ -8,7 +8,7 @@ class SettingsRow extends StatelessWidget {
   final String label;
   final VoidCallback? onTap;
   final Widget? trailing;
-  final bool isDestructive; //makes icon and text red for dangerous actions
+  final bool isDestructive;
 
   const SettingsRow({
     super.key,
@@ -23,11 +23,13 @@ class SettingsRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final onSurface = Theme.of(context).colorScheme.onSurface;
+
     return GestureDetector(
       onTap: onTap,
+      behavior: HitTestBehavior.opaque,
       child: Container(
-        margin: EdgeInsets.only(bottom: 6), // spacing between rows
-        padding: EdgeInsets.symmetric(horizontal: 14, vertical: 13),
+        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(
           color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
           borderRadius: BorderRadius.circular(14),
@@ -37,23 +39,31 @@ class SettingsRow extends StatelessWidget {
         ),
         child: Row(
           children: [
-            // icon
+            // Icon
             Icon(
               icon,
               size: 18,
-              color: isDestructive ? AppColors.red : onSurface.withOpacity(0.5),
+              color: isDestructive
+                  ? AppColors.red
+                  : onSurface.withOpacity(0.5),
             ),
             const SizedBox(width: 12),
-            //label
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-                color: isDestructive ? AppColors.red : onSurface,
+            // Label
+            Expanded(
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  color: isDestructive ? AppColors.red : onSurface,
+                ),
               ),
             ),
-            if (trailing != null) trailing!,
+            // Trailing widget (pushed cleanly to the right)
+            if (trailing != null) ...[
+              const SizedBox(width: 8),
+              trailing!,
+            ],
           ],
         ),
       ),
@@ -63,32 +73,49 @@ class SettingsRow extends StatelessWidget {
 
 // AppToggle widget
 class AppToggle extends StatelessWidget {
-  final bool value; // switch state on or off
-  final ValueChanged<bool> onChanged; // updating viewmodel by true false
+  final bool value;
+  final ValueChanged<bool> onChanged;
 
-  const AppToggle({super.key, required this.value, required this.onChanged});
+  const AppToggle({
+    super.key,
+    required this.value,
+    required this.onChanged,
+  });
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => onChanged(!value),// resolving the sitution on or off
+      onTap: () => onChanged(!value),
+      behavior: HitTestBehavior.opaque,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        width: 36,
-        height: 20,
+        curve: Curves.easeInOut,
+        width: 44, // Slightly wider for smoother proportions
+        height: 24, // Standard pill height
+        padding: const EdgeInsets.all(2), // Clean inner gap
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(99),
-          color: value ? AppColors.accent : Colors.grey.withOpacity(0.3),
+          color: value
+              ? AppColors.accent
+              : Theme.of(context).colorScheme.onSurface.withOpacity(0.15),
         ),
         child: AnimatedAlign(
-          alignment: value ? Alignment.centerRight : Alignment.centerLeft,
           duration: const Duration(milliseconds: 200),
+          curve: Curves.easeInOut,
+          alignment: value ? Alignment.centerRight : Alignment.centerLeft,
           child: Container(
-            margin: const EdgeInsets.all(2),
-            width: 16,
-            height: 16,
+            width: 20,
+            height: 20,
             decoration: const BoxDecoration(
               color: Colors.white,
               shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 3,
+                  offset: Offset(0, 1),
+                ),
+              ],
             ),
           ),
         ),
