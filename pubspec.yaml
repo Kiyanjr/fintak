@@ -31,8 +31,7 @@ dev_dependencies:
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: "assets/logo/fintak.png" # English path matching your assets folder
-  min_sdk_android: 21
+  image_path: "assets/logo/fintak.png" 
 
 flutter:
   uses-material-design: true
