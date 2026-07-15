@@ -1,85 +1,216 @@
-# Overview
-Fintak is a Flutter application for tracking personal finances entirely on-device. It lets you log income and expenses, set budgets per category, and visualize spending trends over time — all wrapped in a polished, theme-aware UI.
-The app is built with MVVM architecture and Riverpod for state management, uses Firebase Auth for account creation/sign-in, and persists financial data locally via SharedPreferences, making it lightweight and easy to run without a backend database.
+# 💰 FinTak
 
- # Features
-•	🔐 Authentication — Email/password sign-up and login via Firebase Auth
-•	🏠 Home dashboard — At-a-glance overview of balance, recent activity, and quick actions
-•	💸 Transactions — Add, view, and browse full transaction history
-•	📊 Budgeting — Set and track budgets by category
-•	📈 Stats & charts — Visual breakdown of spending and income using fl_chart
-•	⚙️ Settings — App preferences and account management
-•	🌗 Light & dark themes — Fully themed UI across every screen
-•	📴 Local-first storage — No cloud database required; data lives on-device via SharedPreferences
+<p align="center">
+  <img src="assets/logo/app_logo.png" width="150" alt="FinTak Logo"/>
+</p>
 
- # Screenshots
+<p align="center">
+  <b>A modern personal finance tracker built with Flutter.</b>
+</p>
+
+<p align="center">
+Track expenses, manage budgets, visualize spending trends, and stay on top of your finances—all from a beautiful, fully offline-first application.
+</p>
+
+---
+
+## ✨ Overview
+
+FinTak is a Flutter application for managing personal finances entirely on-device. It allows users to record income and expenses, create category budgets, and analyze spending habits through interactive charts.
+
+The application follows the **MVVM (Model–View–ViewModel)** architecture and uses **Riverpod** for state management, **Firebase Authentication** for secure sign-in, and **SharedPreferences** for local data persistence.
+
+Since all financial data is stored locally, no cloud database is required.
+
+---
+
+# 📱 Screenshots
 
 ## 🌞 Light Mode
 
-<p align="center"> <img src="assets/logo/screenshots/lightmode1.png" width="45%" alt="Fintak light mode screenshot 1"/> &nbsp;&nbsp; <img src="assets/logo/screenshots/lightmode2.png" width="45%" alt="Fintak light mode screenshot 2"/> </p> 
+<p align="center">
+  <img src="assets/logo/screenshots/lightmode1.png" width="45%">
+  <img src="assets/logo/screenshots/lightmode2.png" width="45%">
+</p>
 
 ## 🌚 Dark Mode
 
-<p align="center"> <img src="assets/logo/screenshots/darkmode1.png" width="45%" alt="Finttak dark mode screenshot 1"/> &nbsp;&nbsp; <img src="assets/logo/screenshots/darkmode2.png" width="45%" alt="Fintak dark mode screenshot 2"/> </p> 
+<p align="center">
+  <img src="assets/logo/screenshots/darkmode1.png" width="45%">
+  <img src="assets/logo/screenshots/darkmode2.png" width="45%">
+</p>
 
-# Tech Stack
-Layer	Technology
-Framework	Flutter (Dart SDK ^3.12.1)
-State Management	flutter_riverpod ^3.3.1
+---
 
-# Architecture	MVVM
-Auth	firebase_auth ^6.5.2 + firebase_core ^4.10.0
-Local Storage	shared_preferences ^2.5.5
-Navigation	go_router ^17.3.0
-Charts	fl_chart ^1.2.0
-Utilities	uuid, intl
+# 🚀 Features
 
-# Project Structure
+- 🔐 **Authentication**
+  - Secure email/password sign up and login with Firebase Authentication.
 
+- 🏠 **Dashboard**
+  - View current balance, recent transactions, and quick financial insights.
 
+- 💸 **Transaction Management**
+  - Add income and expenses.
+  - Browse complete transaction history.
+
+- 📊 **Budget Tracking**
+  - Create budgets for different spending categories.
+  - Monitor budget progress.
+
+- 📈 **Statistics**
+  - Interactive spending and income charts powered by **fl_chart**.
+
+- 🌗 **Theme Support**
+  - Beautiful Light and Dark themes.
+
+- ⚙️ **Settings**
+  - Manage preferences and account information.
+
+- 📴 **Offline First**
+  - Financial data is stored locally using SharedPreferences.
+  - No Firestore database required.
+
+---
+
+# 🛠 Tech Stack
+
+| Category | Technology |
+|-----------|------------|
+| Framework | Flutter |
+| Language | Dart |
+| Architecture | MVVM |
+| State Management | Riverpod |
+| Authentication | Firebase Authentication |
+| Local Storage | SharedPreferences |
+| Navigation | Go Router |
+| Charts | fl_chart |
+| Utilities | uuid, intl |
+
+---
+
+# 📂 Project Structure
+
+```text
 lib/
+│
 ├── core/
-│   ├── constants/       # App-wide constants (colors, etc.)
-│   ├── providers/       # Riverpod app-level providers
-│   ├── router/          # go_router configuration
-│   └── theme/           # Light/dark theme definitions
+│   ├── constants/
+│   ├── providers/
+│   ├── router/
+│   └── theme/
+│
 ├── data/
-│   └── datasources/     # Local data source (SharedPreferences-backed)
+│   └── datasources/
+│
 ├── features/
-│   ├── auth/            # Login & sign-up screens + viewmodels
-│   ├── home/             # Home dashboard & all-transactions screens
-│   ├── budget/           # Budgeting screen & viewmodel
-│   ├── stats/            # Charts & spending statistics
-│   └── settings/         # App settings screen & viewmodel
+│   ├── auth/
+│   ├── home/
+│   ├── budget/
+│   ├── stats/
+│   └── settings/
+│
 ├── shared/
-│   └── widgets/          # Shared widgets (e.g. bottom nav shell)
+│   └── widgets/
+│
 ├── firebase_options.dart
 └── main.dart
+```
 
- 
-  Each feature module follows the same convention: screens/, viewmodels/, and widgets/, keeping UI, state, and presentation logic cleanly separated per MVVM.
- 
-Getting Started
-Prerequisites
-•	Flutter SDK (Dart ^3.12.1)
-•	A configured Firebase project with Email/Password auth enabled
-•	Android Studio / Xcode for mobile builds, or a supported desktop/web target
-Installation
-bash
-# Clone the repo
+### Feature Architecture
+
+Each feature follows the same MVVM structure:
+
+```text
+feature/
+│
+├── screens/
+├── viewmodels/
+└── widgets/
+```
+
+This keeps UI, business logic, and reusable widgets cleanly separated and easy to maintain.
+
+---
+
+# 🚀 Getting Started
+
+## Prerequisites
+
+- Flutter SDK (Dart ^3.12.1)
+- Android Studio / VS Code
+- Firebase Project
+- FlutterFire CLI
+
+---
+
+## Installation
+
+### Clone the repository
+
+```bash
 git clone https://github.com/Kiyanjr/fintak.git
+```
+
+### Navigate into the project
+
+```bash
 cd fintak
+```
 
-# Install dependencies
+### Install dependencies
+
+```bash
 flutter pub get
+```
 
-# Run the app
+### Run the application
+
+```bash
 flutter run
-Firebase Setup
-This project expects a firebase_options.dart generated via the FlutterFire CLI:
-bash
+```
+
+---
+
+# 🔥 Firebase Setup
+
+Generate the required Firebase configuration file:
+
+```bash
 dart pub global activate flutterfire_cli
+
 flutterfire configure
-Note: Data persistence uses SharedPreferences rather than Firestore, so no Firestore setup is required — only Firebase Auth needs to be enabled in your Firebase console.
-Author
-Built by Kiyanjr
+```
+
+> **Note**
+>
+> FinTak only uses **Firebase Authentication**.
+>
+> Financial data is stored locally with **SharedPreferences**, so **Firestore is not required**.
+
+---
+
+# 🎯 Why FinTak?
+
+- 📱 Clean and responsive Flutter UI
+- 🧱 MVVM architecture
+- ⚡ Riverpod state management
+- 🌗 Complete Light & Dark theme support
+- 📊 Beautiful charts
+- 🔐 Secure authentication
+- 📴 Offline-first experience
+- ♻️ Reusable and scalable codebase
+
+---
+
+# 👨‍💻 Author
+
+**Kiyanjr**
+
+GitHub: https://github.com/Kiyanjr
+
+---
+
+## ⭐ Support
+
+If you found this project helpful, consider giving it a **⭐ Star** on GitHub.
