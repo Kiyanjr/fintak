@@ -1,5 +1,5 @@
 # Overview
-Fintrak is a Flutter application for tracking personal finances entirely on-device. It lets you log income and expenses, set budgets per category, and visualize spending trends over time — all wrapped in a polished, theme-aware UI.
+Fintak is a Flutter application for tracking personal finances entirely on-device. It lets you log income and expenses, set budgets per category, and visualize spending trends over time — all wrapped in a polished, theme-aware UI.
 The app is built with MVVM architecture and Riverpod for state management, uses Firebase Auth for account creation/sign-in, and persists financial data locally via SharedPreferences, making it lightweight and easy to run without a backend database.
 
  # Features
@@ -16,11 +16,11 @@ The app is built with MVVM architecture and Riverpod for state management, uses 
 
 ## 🌞 Light Mode
 
-<p align="center"> <img src="assets/logo/screenshots/lightmode1.png" width="45%" alt="Fintrak light mode screenshot 1"/> &nbsp;&nbsp; <img src="assets/logo/screenshots/lightmode2.png" width="45%" alt="Fintrak light mode screenshot 2"/> </p> 
+<p align="center"> <img src="assets/logo/screenshots/lightmode1.png" width="45%" alt="Fintak light mode screenshot 1"/> &nbsp;&nbsp; <img src="assets/logo/screenshots/lightmode2.png" width="45%" alt="Fintak light mode screenshot 2"/> </p> 
 
 ## 🌚 Dark Mode
 
-<p align="center"> <img src="assets/logo/screenshots/darkmode1.png" width="45%" alt="Fintrak dark mode screenshot 1"/> &nbsp;&nbsp; <img src="assets/logo/screenshots/darkmode2.png" width="45%" alt="Fintrak dark mode screenshot 2"/> </p> 
+<p align="center"> <img src="assets/logo/screenshots/darkmode1.png" width="45%" alt="Finttak dark mode screenshot 1"/> &nbsp;&nbsp; <img src="assets/logo/screenshots/darkmode2.png" width="45%" alt="Fintak dark mode screenshot 2"/> </p> 
 
 # Tech Stack
 Layer	Technology
