@@ -1,7 +1,7 @@
 # 💰 FinTak
 
 <p align="center">
-  <img src="assets/logo/app_logo.png" width="150" alt="FinTak Logo"/>
+  <img src="assets/logo/fintak.png" width="150" alt="FinTak Logo"/>
 </p>
 
 <p align="center">
