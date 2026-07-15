@@ -16,11 +16,11 @@ The app is built with MVVM architecture and Riverpod for state management, uses 
 
 ## 🌞 Light Mode
 
-<p align="center"> <img src="assets/screenshots/lightmode1.png" width="45%" alt="Fintrak light mode screenshot 1"/> &nbsp;&nbsp; <img src="assets/screenshots/lightmode2.png" width="45%" alt="Fintrak light mode screenshot 2"/> </p> 
+<p align="center"> <img src="assets/logo/screenshots/lightmode1.png" width="45%" alt="Fintrak light mode screenshot 1"/> &nbsp;&nbsp; <img src="assets/logo/screenshots/lightmode2.png" width="45%" alt="Fintrak light mode screenshot 2"/> </p> 
 
 ## 🌚 Dark Mode
 
-<p align="center"> <img src="assets/screenshots/darkmode1.png" width="45%" alt="Fintrak dark mode screenshot 1"/> &nbsp;&nbsp; <img src="assets/screenshots/darkmode2.png" width="45%" alt="Fintrak dark mode screenshot 2"/> </p> 
+<p align="center"> <img src="assets/logo/screenshots/darkmode1.png" width="45%" alt="Fintrak dark mode screenshot 1"/> &nbsp;&nbsp; <img src="assets/logo/screenshots/darkmode2.png" width="45%" alt="Fintrak dark mode screenshot 2"/> </p> 
 
 # Tech Stack
 Layer	Technology
