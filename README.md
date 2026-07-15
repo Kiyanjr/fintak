@@ -35,6 +35,8 @@ Charts	fl_chart ^1.2.0
 Utilities	uuid, intl
 
 # Project Structure
+
+
 lib/
 ├── core/
 │   ├── constants/       # App-wide constants (colors, etc.)
@@ -54,7 +56,8 @@ lib/
 ├── firebase_options.dart
 └── main.dart
 
- # Each feature module follows the same convention: screens/, viewmodels/, and widgets/, keeping UI, state, and presentation logic cleanly separated per MVVM.
+ 
+  Each feature module follows the same convention: screens/, viewmodels/, and widgets/, keeping UI, state, and presentation logic cleanly separated per MVVM.
  
 Getting Started
 Prerequisites
